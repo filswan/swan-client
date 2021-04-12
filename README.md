@@ -23,10 +23,10 @@ Client Tool provides the following functions:
 ### How to use the client tool
 
 ```shell
-git clone https://github.com/nebulaai/swan
-cd swan/miner
+git clone https://github.com/nebulaai/swan-client
+cd swan-client/filswan_client
 ```
-Please check the [Client Tool Guide](https://github.com/nebulaai/swan/tree/main/client)
+Please check the [Client Tool Guide](https://github.com/nebulaai/swan-client/tree/main/filswan_client)
 
 ## If you are a miner who wants to import deals
 Miner Tool provides the following functions:
@@ -36,11 +36,8 @@ Miner Tool provides the following functions:
 
 ### How to use the miner tool
 
-```shell
-git clone https://github.com/nebulaai/swan
-cd swan/miner
-```
-Please check the [Miner Tool Guide](https://github.com/nebulaai/swan/tree/main/miner)
+
+Please check the [Miner Tool Guide](https://pypi.org/project/filswan-miner/)
 
 ## If you are a developer who wants to use Swan APIs
 
