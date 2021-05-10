@@ -109,10 +109,37 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 
 ## How to use
 
+### Step 0. Encrypt and decrypt file with AES (Optional)
+
+For safety reasons, files need to be encrypted before generating Car files. 
+
+First of all, generate a file which contains the password you pick.
+
+```shell
+python3 swan_cli.py keygen --password [password] --key_filename [key_filename] 
+```
+The output will be like:
+
+```shell
+[password].key
+```
+For encryption:
+
+```shell
+python3 swan_cli.py encrypt --input-file [input_file] --out-encrypted-file [out_encrypted_file] --key_file [keyfile]
+```
+
+For decryption:
+
+```shell
+python3 swan_cli.py decrypt --input-encrypted-file [input_encrypted_file] --out-decrypted-file [out_decrypted_file] --key_file [keyfile]
+```
+
 ### Step 1. Generate Car files for offline deal
 
 For both public task and offline task, you need to generate Car files
 
+#### Step 1.1 Generate Car files for offline deal (option 1)
 ```shell
 python3 swan_cli.py car --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
@@ -130,6 +157,14 @@ INFO:root:Please upload car files to web server or ipfs server.
 If --out-dir is not provided, then the output directory for the car files will be: output_dir (specified in the configuration file) + a random uuid
 
 For example: /tmp/tasks/7f33a9d6-47d0-4635-b152-5e380733bf09
+
+#### Step 1.2 Generate Car files for offline deal locally (option 2)
+
+Generate car files using golang
+
+```shell
+python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
+```
 
 ### Step 2: Upload Car files to webserver or ipfs server
 
