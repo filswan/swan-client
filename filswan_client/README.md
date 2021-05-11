@@ -177,6 +177,8 @@ For example: /tmp/tasks/7f33a9d6-47d0-4635-b152-5e380733bf09
 
 #### Step 1.2 Generate Car files for offline deal locally (option 2)
 
+To use the generation locally, make sure go is available before starting.
+
 Generate car files using golang
 
 ```shell
