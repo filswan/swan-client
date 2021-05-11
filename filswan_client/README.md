@@ -151,6 +151,7 @@ For decryption:
 ```shell
 python3 swan_cli.py decrypt --input-encrypted-file [input_encrypted_file] --out-decrypted-file [out_decrypted_file] --key_file [keyfile]
 ```
+Credits should be given to jokkebk for the encryption and decryption process. More information can be found in https://github.com/jokkebk/fileson
 
 ### Step 1. Generate Car files for offline deal
 
@@ -184,6 +185,7 @@ Generate car files using golang
 ```shell
 python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
+Credits should be given to filedrive-team. More information can be found in https://github.com/GuohaoMa/go-graphsplit.
 
 ### Step 2: Upload Car files to webserver or ipfs server
 
