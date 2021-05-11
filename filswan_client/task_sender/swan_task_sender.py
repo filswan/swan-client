@@ -133,7 +133,7 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
                     
             # no piece_cid generated. use data_cid instead
             data_cid=datacid
-            piece_cid = data_cid
+            piece_cid = None
             # _deal.piece_cid = piece_cid
             # _deal.data_cid = data_cid
             # _deal.car_file_size = os.path.getsize(car_file_path)
