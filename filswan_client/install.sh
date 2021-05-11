@@ -103,8 +103,6 @@ python -m pip install --upgrade pip
 python -m pip install wheel
 #if [ "$INSTALL_PYTHON_VERSION" = "3.8" ]; then
 # This remains in case there is a diversion of binary wheels
-python -m pip install -r requirements.txt 
-rm -rf /usr/local/go && tar -C /usr/local -xzf go1.16.4.linux-amd64.tar.gz
 export PATH=$PATH:/usr/local/go/bin
 cd go-graphsplit-main
 make
@@ -112,4 +110,4 @@ cp graphsplit ..
 
 echo ""
 echo "Swan Client install.sh complete."
-echo "Type '. ./activate' "
+echo "Type '. ./activate' to begin "
