@@ -1,0 +1,5 @@
+*.json 
+*.fson 
+__pycache__ 
+docs/doctrees/
+docs/html/

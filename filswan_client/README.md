@@ -34,11 +34,6 @@ uuid is generated for future index purpose.
 - python 3.7+
 - pip3
 
-## Install python requirements
-
-```shell
-pip3 install -r requirements.txt 
-```
 
 ## Config
 
@@ -107,12 +102,62 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 - **max_price:** Max price willing to pay per GiB/epoch for offline deal
 - **start_epoch_hours:** start_epoch for deals in hours from current time
 
+### Installation:
+#### Ubuntu/Debian
+
+Install and create virtualenv
+
+```shell
+sudo apt-get update
+sudo apt-get upgrade -y
+
+# Install Git
+sudo apt install git -y
+
+# Checkout the source and install
+git clone https://github.com/nebulaai/swan-client
+
+cd swan-client/filswan_client
+
+sh install.sh
+
+. ./activate 
+```
+
 ## How to use
+
+### Step 0. Encrypt and decrypt file with AES (Optional)
+
+For safety reasons, files need to be encrypted before generating Car files. 
+
+First of all, generate a file which contains the password you pick.
+
+```shell
+python3 swan_cli.py keygen --password [password] --key_filename [key_filename] 
+```
+The output will be like:
+
+```shell
+[password].key
+```
+For encryption:
+
+```shell
+python3 swan_cli.py encrypt --input-file [input_file] --out-encrypted-file [out_encrypted_file] --key_file [keyfile]
+```
+
+For decryption:
+
+```shell
+python3 swan_cli.py decrypt --input-encrypted-file [input_encrypted_file] --out-decrypted-file [out_decrypted_file] --key_file [keyfile]
+```
+Credits should be given to jokkebk for the encryption and decryption process. More information can be found in https://github.com/jokkebk/fileson
 
 ### Step 1. Generate Car files for offline deal
 
 For both public task and offline task, you need to generate Car files
 
+#### Step 1.1 Generate Car files for offline deal (option 1)
 ```shell
 python3 swan_cli.py car --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
@@ -130,6 +175,17 @@ INFO:root:Please upload car files to web server or ipfs server.
 If --out-dir is not provided, then the output directory for the car files will be: output_dir (specified in the configuration file) + a random uuid
 
 For example: /tmp/tasks/7f33a9d6-47d0-4635-b152-5e380733bf09
+
+#### Step 1.2 Generate Car files for offline deal locally (option 2)
+
+To use the generation locally, make sure go is available before starting.
+
+Generate car files using golang
+
+```shell
+python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
+```
+Credits should be given to filedrive-team. More information can be found in https://github.com/GuohaoMa/go-graphsplit.
 
 ### Step 2: Upload Car files to webserver or ipfs server
 
