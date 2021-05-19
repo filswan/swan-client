@@ -2,6 +2,7 @@ import csv
 import logging
 import os
 import uuid
+import subprocess
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -93,6 +94,69 @@ def generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDeal]
     logging.info("Please upload car files to web server or ipfs server.")
     return _deal_list
 
+def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDeal]:
+    csv_path = os.path.join(target_dir, "car.csv")
+
+    with open(csv_path, "w") as csv_file:
+        fieldnames = ['car_file_name', 'car_file_path', 'piece_cid', 'data_cid', 'car_file_size', 'car_file_md5',
+                      'source_file_name', 'source_file_path', 'source_file_size', 'source_file_md5', 'car_file_url']
+        csv_writer = csv.DictWriter(csv_file, delimiter=',', fieldnames=fieldnames)
+        csv_writer.writeheader()
+
+        for _deal in _deal_list:
+            car_file_name = _deal.source_file_name + ".car"
+            car_file_path = os.path.join(target_dir, car_file_name)
+            
+            if os.path.isfile(car_file_path):
+                # car_file_name = _deal.source_file_name + str(int(time.time())) + ".car"
+                car_file_name = _deal.source_file_name + ".car"
+                car_file_path = os.path.join(target_dir, car_file_name)
+                    
+            _deal.car_file_name = car_file_name
+            _deal.car_file_path = car_file_path
+            car_md5 = ''
+            if _deal.car_file_md5:
+                car_md5 = checksum(car_file_path)
+            #    _deal.car_file_md5 = car_md5
+
+            ###piece_cid, data_cid = stage_one(_deal.source_file_path, car_file_path)
+            command_line = "./graphsplit chunk --car-dir={} --slice-size=1000000000 --parallel=2 --graph-name={} --parent-path=. {}".format(target_dir, _deal.source_file_name,  _deal.source_file_path)
+            subprocess.run((command_line), shell=True)
+            
+            with open(os.path.join(target_dir,"manifest.csv"),newline='') as csvfile:
+                   reader = csv.DictReader(csvfile)
+                   for row in reader:
+                        if row["filename"] == car_file_name  : 
+                            datacid = row["playload_cid"] 
+                            car_file_path = os.path.join(target_dir, row["playload_cid"] +'.car')
+                            break
+                    
+            # no piece_cid generated. use data_cid instead
+            data_cid=datacid
+            piece_cid = None
+            # _deal.piece_cid = piece_cid
+            # _deal.data_cid = data_cid
+            # _deal.car_file_size = os.path.getsize(car_file_path)
+           
+            csv_data = {
+                'car_file_name': car_file_name,
+                'car_file_path': car_file_path,
+                'piece_cid': piece_cid,
+                'data_cid': data_cid,
+                'car_file_size': os.path.getsize(car_file_path),
+                'car_file_md5': car_md5,
+                'source_file_name': _deal.source_file_name,
+                'source_file_path': _deal.source_file_path,
+                'source_file_size': _deal.source_file_size,
+                'source_file_md5': _deal.source_file_md5,
+                'car_file_url': ''
+            }
+            csv_writer.writerow(csv_data)
+
+    logging.info("Car files output dir: " + target_dir)
+    logging.info("Please upload car files to web server or ipfs server.")
+    return _deal_list
+
 
 def generate_metadata_csv(_deal_list: List[OfflineDeal], _task: SwanTask, _out_dir: str, _uuid: str):
     for deal in _deal_list:
@@ -137,12 +201,38 @@ def generate_car_files(input_dir, config_path, out_dir):
         offline_deal.source_file_name = source_file_name
         offline_deal.source_file_path = file_path
         offline_deal.source_file_size = os.path.getsize(file_path)
+        
         if generate_md5:
             offline_deal.car_file_md5 = True
         deal_list.append(offline_deal)
 
     generate_car(deal_list, output_dir)
 
+def go_generate_car_files(input_dir, config_path, out_dir):
+    config = read_config(config_path)
+    generate_md5 = config['sender']['generate_md5']
+    file_paths = read_file_path_in_dir(input_dir)
+    output_dir = out_dir
+    if not output_dir:
+        output_dir = config['sender']['output_dir'] + '/' + str(uuid.uuid4())
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    deal_list: List[OfflineDeal] = []
+
+    for file_path in file_paths:
+        source_file_name = os.path.basename(file_path)
+
+        offline_deal = OfflineDeal()
+        offline_deal.source_file_name = source_file_name
+        offline_deal.source_file_path = file_path
+        offline_deal.source_file_size = os.path.getsize(file_path)
+        
+        if generate_md5:
+            offline_deal.car_file_md5 = True
+        deal_list.append(offline_deal)
+
+    go_generate_car(deal_list, output_dir)
 
 def upload_car_files(input_dir, config_path):
 
