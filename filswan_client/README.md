@@ -138,7 +138,7 @@ python3 swan_cli.py keygen --password [password] --key_filename [key_filename]
 The output will be like:
 
 ```shell
-[password].key
+[key_filename].key
 ```
 For encryption:
 
