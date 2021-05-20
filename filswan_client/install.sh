@@ -101,6 +101,7 @@ fi
 # pip 20.x+ supports Linux binary wheels
 python -m pip install --upgrade pip
 python -m pip install wheel
+python -m pip install -r requirements.txt
 #if [ "$INSTALL_PYTHON_VERSION" = "3.8" ]; then
 # This remains in case there is a diversion of binary wheels
 export PATH=$PATH:/usr/local/go/bin
