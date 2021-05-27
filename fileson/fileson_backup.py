@@ -7,7 +7,6 @@ import argparse, os, sys, json, signal, time, hashlib, inspect, shutil, re
 import boto3, threading
 #from minio import Minio
 import io
-from minio_config import config
 
 class BotoProgress(object):
     def __init__(self, ptype):
@@ -124,50 +123,6 @@ def etag(args):
     with open(args.input, 'rb') as f: print(calc_etag(f, args.partsize))
 etag.args = 'input partsize'.split()
 
-def upload(args):
-    bucket, objpath = args.miniopath
-    client = Minio(
-    config["endpoint"],
-    access_key=config["access_key"],
-    secret_key=config["secret_key"],
-    secure=False
-    )
-    found = client.bucket_exists(bucket)
-    if not found:
-        client.make_bucket(bucket)
-        print("New bucket is established.")
-    if args.keyfile: 
-        fp = AESFile(args.input, 'rb', key_or_file(args.keyfile))
-        fp_as_bytes =fp.read() 
-        fp_as_a_stream = io.BytesIO(fp_as_bytes)
-        client.put_object(bucket, objpath,fp_as_a_stream,length=len(fp_as_bytes))
-        fp.close()
-    else: 
-        client.fput_object(bucket, objpath,args.input)
-
-    if args.verbose: 
-        print('Upload', args.input, 'to', bucket, objpath)
-    extra = {'Callback': BotoProgress('upload')}
-    if args.deep_archive: 
-        extra['ExtraArgs'] = {'StorageClass': 'DEEP_ARCHIVE'}
-upload.args = 'input miniopath keyfile deep_archive verbose'.split()
-
-def download(args):
-    bucket, objpath = args.miniopath
-    client = Minio(
-    config["endpoint"],
-    access_key=config["access_key"],
-    secret_key=config["secret_key"],
-    secure=False
-    )
-    if args.keyfile: 
-        fin = client.get_object(bucket, objpath)
-        with AESFile(args.output, 'wb', key_or_file(args.keyfile)) as fout:
-            cryptfile(fin,fout) 
-    else: 
-        client.fget_object(bucket, objpath,args.output)
-    if args.verbose: print('Download', bucket, objpath, 'to', args.output)
-download.args = 'miniopath output keyfile verbose'.split()
 
 def backup(args):
     """Perform backup based on latest Fileson DB state."""

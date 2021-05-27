@@ -57,7 +57,7 @@ if __name__ == '__main__':
             print('Please provide --password')
             exit(1)
         key_filename = args.__getattribute__('key_filename')
-        command_line = "python3 fileson-main/fileson_backup.py keygen {} salt > {}.key".format(password, key_filename)
+        command_line = "python3 fileson/fileson_backup.py keygen {} salt > {}.key".format(password, key_filename)
         subprocess.run((command_line), shell=True)
      
     if args.__getattribute__('function') == 'encrypt':
@@ -67,7 +67,7 @@ if __name__ == '__main__':
             exit(1)
         outencryptedfile= args.__getattribute__('out_encrypted_file')
         keyfile = args.__getattribute__('key_file')
-        command_line = "python3 fileson-main/fileson_backup.py encrypt {}  {} {}".format(inputfile, outencryptedfile,keyfile)
+        command_line = "python3 fileson/fileson_backup.py encrypt {}  {} {}".format(inputfile, outencryptedfile,keyfile)
         subprocess.run((command_line), shell=True)
      
     if args.__getattribute__('function') == 'decrypt':
@@ -77,7 +77,7 @@ if __name__ == '__main__':
             exit(1)
         outdecryptedfile= args.__getattribute__('out_decrypted_file')
         keyfile = args.__getattribute__('key_file')
-        command_line = "python3 fileson-main/fileson_backup.py decrypt {}  {} {}".format(inputencryptedfile, outdecryptedfile,keyfile)
+        command_line = "python3 fileson/fileson_backup.py decrypt {}  {} {}".format(inputencryptedfile, outdecryptedfile,keyfile)
         subprocess.run((command_line), shell=True)
           
 

@@ -189,7 +189,7 @@ Generate car files using golang
 ```shell
 python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
-Credits should be given to filedrive-team. More information can be found in https://github.com/GuohaoMa/go-graphsplit.
+Credits should be given to filedrive-team. More information can be found in https://github.com/filedrive-team/go-graphsplit.
 
 ### Step 2: Upload Car files to webserver or ipfs server
 
