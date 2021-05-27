@@ -1,6 +1,6 @@
 import logging.config
 
-from filswan_client.task_sender.service.deal import DealConfig, send_deals_to_miner
+from task_sender.service.deal import DealConfig, send_deals_to_miner
 from common.config import read_config
 
 logging.basicConfig(level=logging.INFO)
