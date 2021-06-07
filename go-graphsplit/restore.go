@@ -1,8 +1,15 @@
-package main
+package graphsplit
 
 import (
 	"context"
 	"fmt"
+	"io"
+	"os"
+	pa "path"
+	"path/filepath"
+	"strings"
+	"sync"
+
 	"github.com/ipfs/go-blockservice"
 	"github.com/ipfs/go-cid"
 	"github.com/ipfs/go-datastore"
@@ -14,11 +21,6 @@ import (
 	unixfile "github.com/ipfs/go-unixfs/file"
 	"github.com/ipld/go-car"
 	"golang.org/x/xerrors"
-	"io"
-	"os"
-	"path/filepath"
-	"strings"
-	"sync"
 )
 
 func Import(path string, st car.Store) (cid.Cid, error) {
@@ -107,6 +109,10 @@ func CarTo(carPath, outputDir string, parallel int) {
 				return err
 			}
 			if fi.IsDir() {
+				return nil
+			}
+			if strings.ToLower(pa.Ext(fi.Name())) != ".car" {
+				log.Warn(path, ", it's not a CAR file, skip it")
 				return nil
 			}
 			workerCh <- func() {
