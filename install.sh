@@ -106,6 +106,8 @@ python -m pip install -r requirements.txt
 # This remains in case there is a diversion of binary wheels
 export PATH=$PATH:/usr/local/go/bin
 cd go-graphsplit
+git submodule update --init --recursive
+make ffi
 make
 cp graphsplit ..
 
