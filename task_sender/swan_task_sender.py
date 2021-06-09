@@ -130,8 +130,9 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
                             datacid = row["playload_cid"] 
                             car_file_path = os.path.join(target_dir, row["playload_cid"] +'.car')
                             piececid = row["piece_cid"]
+                            car_file_name = row["playload_cid"] +'.car'
                             break
-                    
+             
             # no piece_cid generated. use data_cid instead
             data_cid=datacid
             piece_cid = piececid
