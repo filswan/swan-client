@@ -120,7 +120,7 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
             #    _deal.car_file_md5 = car_md5
 
             ###piece_cid, data_cid = stage_one(_deal.source_file_path, car_file_path)
-            command_line = "./graphsplit chunk --car-dir={} --slice-size=1000000000 --parallel=2 --graph-name={} --parent-path=. {}".format(target_dir, _deal.source_file_name,  _deal.source_file_path)
+            command_line = "./graphsplit chunk --car-dir={} --slice-size=1000000000 --parallel=2 --graph-name={} --calc-commp=true --parent-path=. {}".format(target_dir, _deal.source_file_name,  _deal.source_file_path)
             subprocess.run((command_line), shell=True)
             
             with open(os.path.join(target_dir,"manifest.csv"),newline='') as csvfile:
@@ -129,12 +129,13 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
                         if row["filename"] == car_file_name  : 
                             datacid = row["playload_cid"] 
                             car_file_path = os.path.join(target_dir, row["playload_cid"] +'.car')
+                            piececid = row["piece_cid"]
                             car_file_name = row["playload_cid"] +'.car'
                             break
              
             # no piece_cid generated. use data_cid instead
             data_cid=datacid
-            piece_cid = None
+            piece_cid = piececid
             # _deal.piece_cid = piece_cid
             # _deal.data_cid = data_cid
             # _deal.car_file_size = os.path.getsize(car_file_path)
