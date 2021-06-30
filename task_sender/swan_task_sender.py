@@ -27,7 +27,7 @@ def generate_csv_and_send(_task: SwanTask, deal_list: List[OfflineDeal], _output
 
     logging.info('Swan task CSV Generated: %s' % _csv_path)
     with open(_csv_path, "w") as csv_file:
-        fieldnames = ['uuid', 'miner_id', 'deal_cid', 'file_source_url', 'md5', 'start_epoch']
+        fieldnames = ['uuid', 'miner_id', 'deal_cid', 'payload_cid', 'file_source_url', 'md5', 'start_epoch']
         csv_writer = csv.DictWriter(csv_file, delimiter=',', fieldnames=fieldnames)
         csv_writer.writeheader()
         for _deal in deal_list:
@@ -35,6 +35,7 @@ def generate_csv_and_send(_task: SwanTask, deal_list: List[OfflineDeal], _output
                 'uuid': _uuid,
                 'miner_id': _deal.miner_id,
                 'deal_cid': _deal.deal_cid,
+                'payload_cid': _deal.data_cid,
                 'file_source_url': _deal.car_file_url,
                 'md5': _deal.car_file_md5 if _deal.car_file_md5 else "",
                 'start_epoch': _deal.start_epoch
