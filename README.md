@@ -9,12 +9,6 @@ Client Tool provides the following functions:
 * Generate a final CSV file contains deal CIDs and miner id for miner to import deals.
 * Create tasks on Swan Platform.
 
-### How to use the client tool
-
-```shell
-git clone https://github.com/filswan/swan-client.git
-cd swan-client
-```
 
 ## Basic Concept
 
