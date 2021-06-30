@@ -126,9 +126,9 @@ sudo apt-get upgrade -y
 sudo apt install git -y
 
 # Checkout the source and install
-git clone https://github.com/nebulaai/swan-client
+git clone https://github.com/filswan/swan-client.git
 
-cd swan-client/filswan_client
+cd swan-client/
 
 sh install.sh
 
