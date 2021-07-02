@@ -216,6 +216,15 @@ Generate car files using golang
 ```shell
 python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
+
+For example,
+
+```shell
+python3 swan_cli.py gocar --input-dir ../encryption/sample.enc --out-dir ../gocar
+```   
+
+Meanwhile, a car.csv and a manifest.csv with the detail information of the corresponding car files will be generated in the same output directory.    
+   
 Credits should be given to filedrive-team. More information can be found in https://github.com/filedrive-team/go-graphsplit.
 
 ### Step 2: Upload Car files to webserver or ipfs server
