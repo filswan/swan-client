@@ -152,7 +152,7 @@ python3 swan_cli.py keygen --password MySwanClientPassword --key_filename MyPass
 The output key file with AES namely:
 
 ```shell
-Mypassword.key
+MyPassword.key
 ```
 
 #### Step 0.2 File encryption   
@@ -220,7 +220,7 @@ python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_out
 For example,
 
 ```shell
-python3 swan_cli.py gocar --input-dir ../encryption/sample.enc --out-dir ../gocar
+python3 swan_cli.py gocar --input-dir ../encryption --out-dir ../gocar
 ```   
 
 Meanwhile, a car.csv and a manifest.csv with the detail information of the corresponding car files will be generated in the same output directory.    
