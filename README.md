@@ -140,22 +140,41 @@ First of all, generate a file which contains the password you pick.
 ```shell
 python3 swan_cli.py keygen --password [password] --key_filename [key_filename] 
 ```
+
+For example,
+
+```shell
+python3 swan_cli.py keygen --password MySwanClientPassword --key_filename MyPassword 
+```
+
 The output will be like:
 
 ```shell
-[key_filename].key
+Mypassword.key
 ```
 For encryption:
 
 ```shell
 python3 swan_cli.py encrypt --input-file [input_file] --out-encrypted-file [out_encrypted_file] --key_file [keyfile]
 ```
+For example,
 
+```shell
+python3 swan_cli.py encrypt --input-file ../source/sample.zip --out-encrypted-file ../encryption/sample.enc --key_file MyPassword.key
+```
+   
 For decryption:
 
 ```shell
 python3 swan_cli.py decrypt --input-encrypted-file [input_encrypted_file] --out-decrypted-file [out_decrypted_file] --key_file [keyfile]
 ```
+   
+For example,
+
+```shell
+python3 swan_cli.py decrypt --input-encrypted-file ../encryption/sample.enc --out-decrypted-file ../decryption/sample.zip --key_file MyPassword.key
+```
+
 Credits should be given to jokkebk for the encryption and decryption process. More information can be found in https://github.com/jokkebk/fileson
 
 ### Step 1. Generate Car files for offline deal
