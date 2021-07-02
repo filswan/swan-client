@@ -133,6 +133,8 @@ sh install.sh
 
 ### Step 0. Encrypt and decrypt file with AES (Optional)
 
+#### Step 0.1 Password keyfile generation   
+   
 For safety reasons, files need to be encrypted before generating Car files. 
 
 First of all, generate a file which contains the password you pick.
@@ -152,6 +154,9 @@ The output key file with AES namely:
 ```shell
 Mypassword.key
 ```
+
+#### Step 0.2 File encryption   
+   
 For encryption:
 
 ```shell
@@ -162,6 +167,8 @@ For example,
 ```shell
 python3 swan_cli.py encrypt --input-file ../source/sample.zip --out-encrypted-file ../encryption/sample.enc --key_file MyPassword.key
 ```
+
+#### Step 0.3 File decryption     
    
 For decryption:
 
