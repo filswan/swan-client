@@ -193,6 +193,8 @@ For both public task and private task, you need to generate Car files
 python3 swan_cli.py car --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
 
+Note: The input dir and out dir shall only be in format of Absolute Path.   
+   
 The output will be like:
 
 ```shell
