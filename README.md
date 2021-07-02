@@ -147,7 +147,7 @@ For example,
 python3 swan_cli.py keygen --password MySwanClientPassword --key_filename MyPassword 
 ```
 
-The output will be like:
+The output key file with AES namely:
 
 ```shell
 Mypassword.key
