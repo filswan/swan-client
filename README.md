@@ -133,6 +133,8 @@ sh install.sh
 
 ### Step 0. Encrypt and decrypt file with AES (Optional)
 
+#### Step 0.1 Password keyfile generation   
+   
 For safety reasons, files need to be encrypted before generating Car files. 
 
 First of all, generate a file which contains the password you pick.
@@ -140,22 +142,46 @@ First of all, generate a file which contains the password you pick.
 ```shell
 python3 swan_cli.py keygen --password [password] --key_filename [key_filename] 
 ```
-The output will be like:
+
+For example,
 
 ```shell
-[key_filename].key
+python3 swan_cli.py keygen --password MySwanClientPassword --key_filename MyPassword 
 ```
+
+The output key file with AES namely:
+
+```shell
+MyPassword.key
+```
+
+#### Step 0.2 File encryption   
+   
 For encryption:
 
 ```shell
 python3 swan_cli.py encrypt --input-file [input_file] --out-encrypted-file [out_encrypted_file] --key_file [keyfile]
 ```
+For example,
 
+```shell
+python3 swan_cli.py encrypt --input-file ../source/sample.zip --out-encrypted-file ../encryption/sample.enc --key_file MyPassword.key
+```
+
+#### Step 0.3 File decryption     
+   
 For decryption:
 
 ```shell
 python3 swan_cli.py decrypt --input-encrypted-file [input_encrypted_file] --out-decrypted-file [out_decrypted_file] --key_file [keyfile]
 ```
+   
+For example,
+
+```shell
+python3 swan_cli.py decrypt --input-encrypted-file ../encryption/sample.enc --out-decrypted-file ../decryption/sample.zip --key_file MyPassword.key
+```
+
 Credits should be given to jokkebk for the encryption and decryption process. More information can be found in https://github.com/jokkebk/fileson
 
 ### Step 1. Generate Car files for offline deal
@@ -167,6 +193,8 @@ For both public task and private task, you need to generate Car files
 python3 swan_cli.py car --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
 
+Note: The input dir and out dir shall only be in format of Absolute Path.   
+   
 The output will be like:
 
 ```shell
@@ -190,6 +218,15 @@ Generate car files using golang
 ```shell
 python3 swan_cli.py gocar --input-dir [input_files_dir] --out-dir [car_files_output_dir] 
 ```
+
+For example,
+
+```shell
+python3 swan_cli.py gocar --input-dir ../encryption --out-dir ../gocar
+```   
+
+Meanwhile, a car.csv and a manifest.csv with the detail information of the corresponding car files will be generated in the same output directory.    
+   
 Credits should be given to filedrive-team. More information can be found in https://github.com/filedrive-team/go-graphsplit.
 
 ### Step 2: Upload Car files to webserver or ipfs server
