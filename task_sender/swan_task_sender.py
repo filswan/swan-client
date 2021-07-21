@@ -27,7 +27,7 @@ def generate_csv_and_send(_task: SwanTask, deal_list: List[OfflineDeal], _output
 
     logging.info('Swan task CSV Generated: %s' % _csv_path)
     with open(_csv_path, "w") as csv_file:
-        fieldnames = ['uuid', 'miner_id', 'deal_cid', 'file_source_url', 'md5', 'start_epoch']
+        fieldnames = ['uuid', 'miner_id', 'deal_cid', 'payload_cid', 'file_source_url', 'md5', 'start_epoch']
         csv_writer = csv.DictWriter(csv_file, delimiter=',', fieldnames=fieldnames)
         csv_writer.writeheader()
         for _deal in deal_list:
@@ -35,6 +35,7 @@ def generate_csv_and_send(_task: SwanTask, deal_list: List[OfflineDeal], _output
                 'uuid': _uuid,
                 'miner_id': _deal.miner_id,
                 'deal_cid': _deal.deal_cid,
+                'payload_cid': _deal.data_cid,
                 'file_source_url': _deal.car_file_url,
                 'md5': _deal.car_file_md5 if _deal.car_file_md5 else "",
                 'start_epoch': _deal.start_epoch
@@ -120,7 +121,7 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
             #    _deal.car_file_md5 = car_md5
 
             ###piece_cid, data_cid = stage_one(_deal.source_file_path, car_file_path)
-            command_line = "./graphsplit chunk --car-dir={} --slice-size=1000000000 --parallel=2 --graph-name={} --parent-path=. {}".format(target_dir, _deal.source_file_name,  _deal.source_file_path)
+            command_line = "./graphsplit chunk --car-dir={} --slice-size=1000000000 --parallel=2 --graph-name={} --calc-commp=true --parent-path=. {}".format(target_dir, _deal.source_file_name,  _deal.source_file_path)
             subprocess.run((command_line), shell=True)
             
             with open(os.path.join(target_dir,"manifest.csv"),newline='') as csvfile:
@@ -129,11 +130,13 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
                         if row["filename"] == car_file_name  : 
                             datacid = row["playload_cid"] 
                             car_file_path = os.path.join(target_dir, row["playload_cid"] +'.car')
+                            piececid = row["piece_cid"]
+                            car_file_name = row["playload_cid"] +'.car'
                             break
-                    
+             
             # no piece_cid generated. use data_cid instead
             data_cid=datacid
-            piece_cid = None
+            piece_cid = piececid
             # _deal.piece_cid = piece_cid
             # _deal.data_cid = data_cid
             # _deal.car_file_size = os.path.getsize(car_file_path)
