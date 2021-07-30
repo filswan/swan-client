@@ -2,4 +2,4 @@ toml
 requests
 boto3
 pycryptodome==3.4.3
-jwt
+PyJWT==1.7.1
