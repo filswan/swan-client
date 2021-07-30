@@ -359,7 +359,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
             deal.car_file_url = os.path.join(download_url_prefix, deal.car_file_name)
 
     if not public_deal:
-        final_csv_path = send_deals(config_path, miner_id, task_name, deal_list=deal_list, task_uuid=task_uuid)
+        final_csv_path = send_deals(config_path, miner_id, task_name, deal_list=deal_list, task_uuid=task_uuid, out_dir=output_dir)
 
     if offline_mode:
         client = None
