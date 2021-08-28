@@ -312,7 +312,7 @@ uuid,source_file_name,source_file_path,source_file_md5,source_file_url,source_fi
    for sending the offline deals to the miner.
 
 ```
-python3 swan_cli.py deal --csv [metada_csv_dir/task-name-metadata.csv] --out-dir [output_files_dir] --miner [miner_id]
+python3 swan_cli.py deal --csv [metadata_csv_dir/task-name-metadata.csv] --out-dir [output_files_dir] --miner [miner_id]
 ```
 
 **--csv (Required):** File path to the metadata CSV file. Mandatory metadata CSV fields: source_file_size, car_file_url, data_cid,
