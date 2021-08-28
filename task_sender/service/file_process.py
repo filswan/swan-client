@@ -26,7 +26,7 @@ def generate_car(input_path, output_path: str):
 def import_by_lotus(file):
     # 1. import
     logging.info('Generating data CID....')
-    proc = subprocess.Popen(['lotus', 'client', 'import', file], stdout=subprocess.PIPE)
+    proc = subprocess.Popen(['lotus', 'client', 'import', '--car', file], stdout=subprocess.PIPE)
     resp = proc.stdout.readline().rstrip().decode('utf-8')
     data_cid = resp.split("Root ")[1]
     logging.info('Data CID: %s' % data_cid)
