@@ -298,6 +298,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
     verified_deal = config['sender']['verified_deal']
     generate_md5 = config['sender']['generate_md5']
     offline_mode = config['sender']['offline_mode']
+    fast_retrieval = config['sender']['fast_retrieval']
     bid_mode = config['sender']['bid_mode']
 
     api_url = config['main']['api_url']
@@ -379,6 +380,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
         description=description,
         is_public=public_deal,
         is_verified=verified_deal,
+        fast_retrieval = fast_retrieval,
         bid_mode = bid_mode
     )
 
@@ -512,7 +514,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
 
         from_wallet = config['sender']['wallet']
         max_price = task_info["max_price"]
-        fast_retrieval = task_info['fast_retrieval']
+        fast_retrieval = _deal['fast_retrieval']
         epoch_interval_hours = task_info['start_epoch_hours']
         skip_confirmation = True
         deal_config = DealConfig(miner_id, from_wallet, max_price, task_info["type"], fast_retrieval, epoch_interval_hours)
