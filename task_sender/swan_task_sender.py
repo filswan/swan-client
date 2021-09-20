@@ -16,7 +16,7 @@ from common.swan_client import SwanClient, SwanTask
 from .deal_sender import send_deals
 from .service.file_process import checksum, stage_one
 from common.swan_client import send_http_request
-from task_sender.service.deal import propose_offline_deal, get_miner_price,calculate_piece_size_from_file_size,calculate_real_cost
+from task_sender.service.deal import propose_offline_deals, get_miner_price,calculate_piece_size_from_file_size,calculate_real_cost
 from decimal import Decimal
 
 def read_file_path_in_dir(dir_path: str) -> List[str]:
@@ -397,8 +397,6 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
 def check_task_status(task_uuid,config_path):
     config = read_config(config_path)
     api_url = config['main']['api_url']
-    ## api_key = config['main']['api_key']
-    ## access_token = config['main']['access_token']
     logging.info('Getting Swan task status, uuid: %s' % task_uuid)
     get_task_url_suffix = '/tasks/'
     get_task_method = 'GET'
@@ -409,13 +407,14 @@ def check_task_status(task_uuid,config_path):
     task_status = resp["task"]["status"]
     bids = resp["bid"]
     deals = resp['deal']
+    task = resp['task']
     won_bid = {}
     for bid in bids:
         if bid['status'] == 'Assigned':
             won_bid = bid
             break
 
-    task_bid_dict ={'task_uuid':task_uuid,'task_status':task_status,'bids':bids,'won_bid':won_bid,'deals':deals}
+    task_bid_dict ={'task_uuid':task_uuid,'task_status':task_status,'bids':bids,'won_bid':won_bid,'deals':deals,'task':task}
     logging.info('Swan task status is: %s'% json.dumps(task_bid_dict))
     return task_bid_dict
 
@@ -481,7 +480,6 @@ def get_tasks(config_path):
         jwt_token_expiration = payload['exp']
     except Exception as e:
         logging.info(str(e))
-    print(jwt_token)
     logging.info('Getting My swan tasks info')
     get_task_url_suffix = '/tasks'
     get_task_method = 'GET'
@@ -506,36 +504,41 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
     config = read_config(config_path)
     deals_list=[]
     for _deal in deals:
-        data_cid = _deal.data_cid
-        piece_cid = _deal.piece_cid
-        file_size = _deal.source_file_size
+        data_cid = _deal["payload_cid"]
+        piece_cid = _deal["piece_cid"]
+        file_size = _deal["file_size"]
         prices = get_miner_price(miner_id)
+        price = 0
         if prices:
             if task_info["type"]:
                 price = prices['verified_price']
             else:
                 price = prices['price']
-
         from_wallet = config['sender']['wallet']
         max_price = task_info["max_price"]
         fast_retrieval = _deal['fast_retrieval']
-        epoch_interval_hours = task_info['start_epoch_hours']
+        epoch_interval_hours = _deal['start_epoch']
         skip_confirmation = True
         deal_config = DealConfig(miner_id, from_wallet, max_price, task_info["type"], fast_retrieval, epoch_interval_hours)
 
         if Decimal(price).compare(Decimal(max_price)) > 0:
             logging.warning(
                 "miner %s price %s higher than max price %s" % (miner_id, price, max_price))
-        if int(file_size) > 0:
-            piece_size, sector_size = calculate_piece_size_from_file_size(file_size)
-        else:
-            logging.error("file %s is too small" % _deal.source_file_name)
-
-        cost = f'{calculate_real_cost(sector_size, price):.18f}'
-
-        _deal_cid, _start_epoch = propose_offline_deal(price, str(cost), str(piece_size), data_cid, piece_cid,
+        sector_size = None
+        if file_size:
+            if int(file_size) > 0:
+                piece_size, sector_size = calculate_piece_size_from_file_size(file_size)
+            else:
+                logging.error("file is too small")
+        cost = None
+        if sector_size:
+            cost = f'{calculate_real_cost(sector_size, price):.18f}'
+        _deal_cid = None
+        if cost:
+            _deal_cid, _start_epoch = propose_offline_deals(price, str(cost), str(piece_size), data_cid, piece_cid,
                                                        deal_config, skip_confirmation)
-        deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal.car_file_md5,'file_source_url': _deal.car_file_url})
+        if _deal_cid:
+            deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal.car_file_md5,'file_source_url': _deal.car_file_url})
 
     ## save task csv
     output_dir = out_dir
