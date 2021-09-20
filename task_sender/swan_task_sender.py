@@ -31,7 +31,7 @@ def generate_csv_and_send(_task: SwanTask, deal_list: List[OfflineDeal], _output
 
     logging.info('Swan task CSV Generated: %s' % _csv_path)
     with open(_csv_path, "w") as csv_file:
-        fieldnames = ['uuid', 'miner_id', 'deal_cid', 'payload_cid', 'file_source_url', 'md5', 'start_epoch']
+        fieldnames = ['uuid', 'miner_id', 'deal_cid', 'payload_cid', 'file_source_url', 'md5', 'start_epoch','piece_cid','file_size']
         csv_writer = csv.DictWriter(csv_file, delimiter=',', fieldnames=fieldnames)
         csv_writer.writeheader()
         for _deal in deal_list:
@@ -42,7 +42,9 @@ def generate_csv_and_send(_task: SwanTask, deal_list: List[OfflineDeal], _output
                 'payload_cid': _deal.data_cid,
                 'file_source_url': _deal.car_file_url,
                 'md5': _deal.car_file_md5 if _deal.car_file_md5 else "",
-                'start_epoch': _deal.start_epoch
+                'start_epoch': _deal.start_epoch,
+                'piece_cid': _deal.piece_cid,
+                'file_size': _deal.car_file_size
             }
             csv_writer.writerow(csv_data)
 
@@ -299,6 +301,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
     generate_md5 = config['sender']['generate_md5']
     offline_mode = config['sender']['offline_mode']
     fast_retrieval = config['sender']['fast_retrieval']
+    max_price = config['sender']['max_price']
     bid_mode = config['sender']['bid_mode']
 
     api_url = config['main']['api_url']
@@ -381,6 +384,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
         is_public=public_deal,
         is_verified=verified_deal,
         fast_retrieval = fast_retrieval,
+        max_price = max_price,
         bid_mode = bid_mode
     )
 
@@ -581,7 +585,6 @@ def update_assigned_task(config_path, task_uuid, assigned_miner_id):
         jwt_token_expiration = payload['exp']
     except Exception as e:
         logging.info(str(e))
-    print(jwt_token)
     logging.info('Getting My swan tasks info')
     get_task_url_suffix = '/tasks/'
     get_task_method = 'PUT'
