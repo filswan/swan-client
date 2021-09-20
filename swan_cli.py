@@ -6,7 +6,7 @@ import csv
 import subprocess
 from miner_updater.swan_miner_updater import update_miner_info
 from task_sender.deal_sender import send_deals
-from task_sender.swan_task_sender import create_new_task, update_task_by_uuid, generate_car_files, go_generate_car_files,upload_car_files
+from task_sender.swan_task_sender import create_new_task, update_task_by_uuid, generate_car_files, go_generate_car_files,upload_car_files,check_task_status,assign_bid,get_tasks,send_autobid_deal,update_assigned_task
 
 
 def random_hash(length=6):
@@ -18,8 +18,8 @@ def random_hash(length=6):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Swan client')
 
-    parser.add_argument('function', metavar='task/deal', choices=['task', 'deal', 'miner', 'car', 'upload','gocar','keygen','encrypt','decrypt'], type=str, nargs="?",
-                        help='Create new Swan task/Send deal/Update miner info/Generate car file')
+    parser.add_argument('function', metavar='task/deal', choices=['task', 'deal', 'miner', 'car', 'upload','gocar','keygen','encrypt','decrypt','status', 'assign','auto'], type=str, nargs="?",
+                        help='Create new Swan task/Send deal/Update miner info/Generate car file/Get task status')
 
     parser.add_argument('--config', dest='config_path', default="./config.toml",
                         help="Path to the config file (default: ./config.toml)")
@@ -43,8 +43,9 @@ if __name__ == '__main__':
     parser.add_argument('--input-encrypted-file', dest='input_encrypted_file', help="Input encrypted file")
     parser.add_argument('--out-decrypted-file', dest='out_decrypted_file', help="Output decrypted file")
     parser.add_argument('--key_file', dest='key_file', help="Input file with .key extention where encrypted password is restored for encryption and decryption")
-    
-    
+
+    parser.add_argument('--task', dest='task_uuid', help="Get task status by uuid.")
+    parser.add_argument('--bid', dest='bid_id', help="Bid id")
 
     args = parser.parse_args()
 
@@ -148,3 +149,51 @@ if __name__ == '__main__':
             exit(1)
 
         update_miner_info(miner_id, config_path)
+
+    elif args.__getattribute__('function') == "status":
+        task_uuid = args.__getattribute__('task_uuid')
+        if not task_uuid:
+            print('Please provide --task')
+            exit(1)
+        task_bid_dict = check_task_status(task_uuid,config_path)
+
+
+    elif args.__getattribute__('function') == "assign":
+        won_bid_id = args.__getattribute__('bid_id')
+        if not won_bid_id:
+            print('Please provide --bid')
+            exit(1)
+        task_uuid = args.__getattribute__('task_uuid')
+        if not task_uuid:
+            print('Please provide --task')
+            exit(1)
+        miner_id = args.__getattribute__('miner_id')
+        if not miner_id:
+            print('Please provide --miner')
+            exit(1)
+        metadata_csv_path = args.__getattribute__('metadata_csv_path')
+        if not metadata_csv_path:
+            print('Please provide --csv')
+            exit(1)
+        metadata_csv_path = os.path.abspath(metadata_csv_path)
+        with open(metadata_csv_path, 'r') as csvfile:
+            reader = csv.reader(csvfile)
+            column = [row[0] for row in reader]
+            assigned_bid = assign_bid(task_uuid,won_bid_id,miner_id,config_path,csvfile)
+
+    elif args.__getattribute__('function') == "auto":
+        out_dir = args.__getattribute__('out_dir')
+
+        tasks_dict = get_tasks(config_path)
+        for task in tasks_dict["Assigned tasks"]:
+            assigned_task = check_task_status(task["uuid"],config_path)
+            assigned_bid = assigned_task["won_bid"]
+            assigned_task_info= assigned_task["task"]
+            assigned_miner_id = assigned_bid["swan_user_info"]["miners"][0]['miner_id']
+            deals = assigned_task['deals']
+            #print(assigned_bid,assigned_miner_id,deals,assigned_task_info)
+            send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
+            update_assigned_task(config_path, assigned_task_info['uuid'], assigned_miner_id)
+
+
+

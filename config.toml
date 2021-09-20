@@ -1,7 +1,7 @@
 [main]
-api_key = ""
-access_token = ""
-api_url = "https://api.filswan.com"
+api_key = "qg8sMtm4170sTRZHHgbPVQ"
+access_token = "ce40069ffe95ecafbfb0ad2a72fdee0d"
+api_url = "http://192.168.88.216:5002"
 storage_server_type = "ipfs server"
 
 [web-server]
@@ -13,6 +13,7 @@ path = "/download"
 gateway_address = "/ip4/127.0.0.1/tcp/8080"
 
 [sender]
+bid_mode = 1
 offline_mode = false
 output_dir = "/tmp/tasks"
 public_deal = true

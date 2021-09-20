@@ -3,6 +3,8 @@ import logging
 import os
 import uuid
 import subprocess
+import json
+import jwt
 from os import listdir
 from os.path import isfile, join
 from pathlib import Path
@@ -13,7 +15,9 @@ from common.config import read_config
 from common.swan_client import SwanClient, SwanTask
 from .deal_sender import send_deals
 from .service.file_process import checksum, stage_one
-
+from common.swan_client import send_http_request
+from task_sender.service.deal import propose_offline_deal, get_miner_price,calculate_piece_size_from_file_size,calculate_real_cost
+from decimal import Decimal
 
 def read_file_path_in_dir(dir_path: str) -> List[str]:
     _file_paths = [join(dir_path, f) for f in listdir(dir_path) if isfile(join(dir_path, f))]
@@ -294,6 +298,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
     verified_deal = config['sender']['verified_deal']
     generate_md5 = config['sender']['generate_md5']
     offline_mode = config['sender']['offline_mode']
+    bid_mode = config['sender']['bid_mode']
 
     api_url = config['main']['api_url']
     api_key = config['main']['api_key']
@@ -373,7 +378,8 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
         curated_dataset=curated_dataset,
         description=description,
         is_public=public_deal,
-        is_verified=verified_deal
+        is_verified=verified_deal,
+        bid_mode = bid_mode
     )
 
     if miner_id:
@@ -381,3 +387,221 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
 
     generate_metadata_csv(deal_list, task, output_dir, task_uuid)
     generate_csv_and_send(task, deal_list, output_dir, client, task_uuid)
+
+def check_task_status(task_uuid,config_path):
+    config = read_config(config_path)
+    api_url = config['main']['api_url']
+    ## api_key = config['main']['api_key']
+    ## access_token = config['main']['access_token']
+    logging.info('Getting Swan task status, uuid: %s' % task_uuid)
+    get_task_url_suffix = '/tasks/'
+    get_task_method = 'GET'
+
+    get_task_url = api_url + get_task_url_suffix + task_uuid
+    payload_data = ""
+    resp=send_http_request(get_task_url, get_task_method,None, payload_data)
+    task_status = resp["task"]["status"]
+    bids = resp["bid"]
+    deals = resp['deal']
+    won_bid = {}
+    for bid in bids:
+        if bid['status'] == 'Assigned':
+            won_bid = bid
+            break
+
+    task_bid_dict ={'task_uuid':task_uuid,'task_status':task_status,'bids':bids,'won_bid':won_bid,'deals':deals}
+    logging.info('Swan task status is: %s'% json.dumps(task_bid_dict))
+    return task_bid_dict
+
+def assign_bid(task_uuid,won_bid_id,miner_id,config_path,csvfile):
+    config = read_config(config_path)
+    api_url = config['main']['api_url']
+    api_key = config['main']['api_key']
+    access_token = config['main']['access_token']
+
+    logging.info('Refreshing token')
+    refresh_api_token_suffix = "/user/api_keys/jwt"
+    refresh_api_token_method = 'POST'
+
+    refresh_token_url = api_url + refresh_api_token_suffix
+    data = {
+        "apikey": api_key,
+        "access_token": access_token
+    }
+    jwt_token=""
+    try:
+        resp_data = send_http_request(refresh_token_url, refresh_api_token_method, None, json.dumps(data))
+        jwt_token = resp_data['jwt']
+        payload = jwt.decode(jwt=jwt_token, verify=False, algorithm='HS256')
+        jwt_token_expiration = payload['exp']
+    except Exception as e:
+        logging.info(str(e))
+    print(jwt_token)
+    logging.info('Getting Swan task status: %s' % task_uuid)
+    get_task_url_suffix = '/tasks/'
+    get_task_method = 'PUT'
+
+    get_task_url = api_url + get_task_url_suffix + task_uuid
+    payload_data = {
+        "won_bid_id": won_bid_id,
+        "miner_id":miner_id
+    }
+    jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjMzNzY5MjAsImlhdCI6MTYzMTg0MDkyMCwic3ViIjoxODR9.TVNaM3rut0cuG0zClUgde5sY38yNRNomOHV3Oeiw4Oc"
+    resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
+    assigned_task_uuid= resp["task_uuid"]
+    logging.info('Swan task status of %s is assigned to bid %s'%(assigned_task_uuid,won_bid_id))
+    return assigned_task_uuid
+
+def get_tasks(config_path):
+    config = read_config(config_path)
+    api_url = config['main']['api_url']
+    api_key = config['main']['api_key']
+    access_token = config['main']['access_token']
+
+    logging.info('Refreshing token')
+    refresh_api_token_suffix = "/user/api_keys/jwt"
+    refresh_api_token_method = 'POST'
+
+    refresh_token_url = api_url + refresh_api_token_suffix
+    data = {
+        "apikey": api_key,
+        "access_token": access_token
+    }
+    jwt_token=""
+    try:
+        resp_data = send_http_request(refresh_token_url, refresh_api_token_method, None, json.dumps(data))
+        jwt_token = resp_data['jwt']
+        payload = jwt.decode(jwt=jwt_token, verify=False, algorithm='HS256')
+        jwt_token_expiration = payload['exp']
+    except Exception as e:
+        logging.info(str(e))
+    print(jwt_token)
+    logging.info('Getting My swan tasks info')
+    get_task_url_suffix = '/tasks'
+    get_task_method = 'GET'
+
+    get_task_url = api_url + get_task_url_suffix
+    payload_data = ""
+    resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
+    limit=resp['total_task_count']
+    logging.info('Swan task count %s'%str(limit))
+    get_task_url = api_url + get_task_url_suffix+"?limit="+str(limit)
+    payload_data = ""
+    resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
+    tasks = resp['task']
+    assigned_task_list=[]
+    for task in tasks:
+        if task["status"] == 'Assigned':
+            assigned_task_list.append(task)
+    assigned_task_dict={'Assigned tasks': assigned_task_list}
+    return assigned_task_dict
+
+def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
+    config = read_config(config_path)
+    deals_list=[]
+    for _deal in deals:
+        data_cid = _deal.data_cid
+        piece_cid = _deal.piece_cid
+        file_size = _deal.source_file_size
+        prices = get_miner_price(miner_id)
+        if prices:
+            if task_info["type"]:
+                price = prices['verified_price']
+            else:
+                price = prices['price']
+
+        from_wallet = config['sender']['wallet']
+        max_price = task_info["max_price"]
+        fast_retrieval = task_info['fast_retrieval']
+        epoch_interval_hours = task_info['start_epoch_hours']
+        skip_confirmation = True
+        deal_config = DealConfig(miner_id, from_wallet, max_price, task_info["type"], fast_retrieval, epoch_interval_hours)
+
+        if Decimal(price).compare(Decimal(max_price)) > 0:
+            logging.warning(
+                "miner %s price %s higher than max price %s" % (miner_id, price, max_price))
+        if int(file_size) > 0:
+            piece_size, sector_size = calculate_piece_size_from_file_size(file_size)
+        else:
+            logging.error("file %s is too small" % _deal.source_file_name)
+
+        cost = f'{calculate_real_cost(sector_size, price):.18f}'
+
+        _deal_cid, _start_epoch = propose_offline_deal(price, str(cost), str(piece_size), data_cid, piece_cid,
+                                                       deal_config, skip_confirmation)
+        deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal.car_file_md5,'file_source_url': _deal.car_file_url})
+
+    ## save task csv
+    output_dir = out_dir
+    if not out_dir:
+        output_dir = config['sender']['output_dir']
+
+    Path(output_dir).mkdir(parents=True, exist_ok=True)
+
+    output_csv_path = os.path.join(output_dir, task_info["uuid"] + ".csv")
+
+    with open(output_csv_path, "w") as output_csv_file:
+        output_fieldnames = ['uuid', 'miner_id', 'file_source_url', 'md5', 'start_epoch', 'deal_cid']
+        csv_writer = csv.DictWriter(output_csv_file, delimiter=',', fieldnames=output_fieldnames)
+        csv_writer.writeheader()
+
+        for deal in deals_list:
+            csv_data = {
+                'uuid': deal.uuid,
+                'miner_id': deal.miner_id,
+                'file_source_url': deal.car_file_url,
+                'md5': deal.car_file_md5,
+                'start_epoch': deal.start_epoch,
+                'deal_cid': deal.deal_cid
+            }
+            csv_writer.writerow(csv_data)
+
+def update_assigned_task(config_path, task_uuid, assigned_miner_id):
+    config = read_config(config_path)
+    api_url = config['main']['api_url']
+    api_key = config['main']['api_key']
+    access_token = config['main']['access_token']
+
+    logging.info('Refreshing token')
+    refresh_api_token_suffix = "/user/api_keys/jwt"
+    refresh_api_token_method = 'POST'
+
+    refresh_token_url = api_url + refresh_api_token_suffix
+    data = {
+        "apikey": api_key,
+        "access_token": access_token
+    }
+    jwt_token=""
+    try:
+        resp_data = send_http_request(refresh_token_url, refresh_api_token_method, None, json.dumps(data))
+        jwt_token = resp_data['jwt']
+        payload = jwt.decode(jwt=jwt_token, verify=False, algorithm='HS256')
+        jwt_token_expiration = payload['exp']
+    except Exception as e:
+        logging.info(str(e))
+    print(jwt_token)
+    logging.info('Getting My swan tasks info')
+    get_task_url_suffix = '/tasks/'
+    get_task_method = 'PUT'
+
+    get_task_url = api_url + get_task_url_suffix + task_uuid
+    payload_data = {"status":"DealSent","miner_id":assigned_miner_id}
+    resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
+    return resp
+
+
+class DealConfig:
+    miner_id = None
+    sender_wallet = None
+    max_price = None
+    verified_deal = None
+    fast_retrieval = None
+    epoch_interval_hours = None
+
+    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours):
+        self.miner_id = miner_id
+        self.sender_wallet = sender_wallet
+        self.max_price = max_price
+        self.verified_deal = verified_deal
+        self.fast_retrieval = fast_retrieval
+        self.epoch_interval_hours = epoch_interval_hours

@@ -145,6 +145,7 @@ def send_deals_to_miner(deal_conf: DealConfig, output_dir, skip_confirmation: bo
                     deal.__setattr__(attr, row.get(attr))
                 deal_list.append(deal)
 
+
     for _deal in deal_list:
 
         data_cid = _deal.data_cid
