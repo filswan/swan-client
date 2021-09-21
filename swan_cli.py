@@ -5,6 +5,7 @@ import string
 import csv
 import subprocess
 import time
+import logging
 from miner_updater.swan_miner_updater import update_miner_info
 from task_sender.deal_sender import send_deals
 from task_sender.swan_task_sender import create_new_task, update_task_by_uuid, generate_car_files, go_generate_car_files,upload_car_files,check_task_status,assign_bid,get_tasks,send_autobid_deal,update_assigned_task
@@ -185,17 +186,22 @@ if __name__ == '__main__':
     elif args.__getattribute__('function') == "auto":
         out_dir = args.__getattribute__('out_dir')
         while True:
-            print('----------scan begin')
-            tasks_dict = get_tasks(config_path)
-            for task in tasks_dict["Assigned tasks"]:
-                assigned_task = check_task_status(task["uuid"],config_path)
-                assigned_bid = assigned_task["won_bid"]
-                assigned_task_info= assigned_task["task"]
-                assigned_miner_id = assigned_bid["swan_user_info"]["miners"][0]['miner_id']
-                deals = assigned_task['deals']
-                send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
-                update_assigned_task(config_path, assigned_task_info['uuid'], assigned_miner_id)
-            time.sleep(30)
+            try:
+                tasks_dict = get_tasks(config_path)
+                for task in tasks_dict["Assigned tasks"]:
+                    assigned_task = check_task_status(task["uuid"],config_path)
+                    assigned_bid = assigned_task["won_bid"]
+                    assigned_task_info= assigned_task["task"]
+                    if assigned_bid and assigned_task_info:
+                        assigned_miner_id = assigned_bid["swan_user_info"]["miners"][0]['miner_id']
+                        deals = assigned_task['deals']
+                        send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
+                        update_assigned_task(config_path, assigned_task_info['uuid'], assigned_miner_id)
+                time.sleep(30)
+            except Exception as e:
+                logging.error(e)
+                time.sleep(30)
+
 
 
 
