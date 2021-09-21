@@ -16,8 +16,10 @@ from common.swan_client import SwanClient, SwanTask
 from .deal_sender import send_deals
 from .service.file_process import checksum, stage_one
 from common.swan_client import send_http_request
-from task_sender.service.deal import propose_offline_deals, get_miner_price,calculate_piece_size_from_file_size,calculate_real_cost
+from task_sender.service.deal import propose_offline_deals, get_miner_price,calculate_piece_size_from_file_size,calculate_real_cost,EPOCH_PER_HOUR,get_current_epoch_by_current_time
 from decimal import Decimal
+
+
 
 def read_file_path_in_dir(dir_path: str) -> List[str]:
     _file_paths = [join(dir_path, f) for f in listdir(dir_path) if isfile(join(dir_path, f))]
@@ -303,6 +305,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
     fast_retrieval = config['sender']['fast_retrieval']
     max_price = config['sender']['max_price']
     bid_mode = config['sender']['bid_mode']
+    start_epoch = config['sender']['start_epoch_hours']
 
     api_url = config['main']['api_url']
     api_key = config['main']['api_key']
@@ -359,6 +362,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
             deal = OfflineDeal()
             for attr in row.keys():
                 deal.__setattr__(attr, row.get(attr))
+                deal.start_epoch = get_current_epoch_by_current_time() + (start_epoch + 1) * EPOCH_PER_HOUR
             deal_list.append(deal)
 
     # generate_car(deal_list, output_dir)
