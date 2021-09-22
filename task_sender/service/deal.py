@@ -27,9 +27,8 @@ class DealConfig:
     fast_retrieval = None
     epoch_interval_hours = None
     start_epoch = None
-    expire_days = None
 
-    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours,start_epoch,expire_days):
+    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours,start_epoch):
         self.miner_id = miner_id
         self.sender_wallet = sender_wallet
         self.max_price = max_price
@@ -37,7 +36,6 @@ class DealConfig:
         self.fast_retrieval = fast_retrieval
         self.epoch_interval_hours = epoch_interval_hours
         self.start_epoch = start_epoch
-        self.expire_days = expire_days
 
 def get_current_epoch_by_current_time():
     current_timestamp = int(time.time())
