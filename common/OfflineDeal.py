@@ -18,4 +18,3 @@ class OfflineDeal:
     piece_cid = None
     miner_id = None
     start_epoch = None
-

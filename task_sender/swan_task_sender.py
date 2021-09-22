@@ -18,7 +18,7 @@ from .service.file_process import checksum, stage_one
 from common.swan_client import send_http_request
 from task_sender.service.deal import propose_offline_deals, get_miner_price,calculate_piece_size_from_file_size,calculate_real_cost,EPOCH_PER_HOUR,get_current_epoch_by_current_time
 from decimal import Decimal
-
+from task_sender.service.deal import DealConfig
 
 
 def read_file_path_in_dir(dir_path: str) -> List[str]:
@@ -306,6 +306,10 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
     max_price = config['sender']['max_price']
     bid_mode = config['sender']['bid_mode']
     start_epoch = config['sender']['start_epoch_hours']
+    expire_days = config['sender']['expire_days']
+
+    if not expire_days:
+        expire_days = 4
 
     api_url = config['main']['api_url']
     api_key = config['main']['api_key']
@@ -389,7 +393,8 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
         is_verified=verified_deal,
         fast_retrieval = fast_retrieval,
         max_price = max_price,
-        bid_mode = bid_mode
+        bid_mode = bid_mode,
+        expire_days = expire_days
     )
 
     if miner_id:
@@ -602,20 +607,3 @@ def update_assigned_task(config_path, task_uuid, assigned_miner_id):
     return resp
 
 
-class DealConfig:
-    miner_id = None
-    sender_wallet = None
-    max_price = None
-    verified_deal = None
-    fast_retrieval = None
-    epoch_interval_hours = None
-    start_epoch = None
-
-    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours,start_epoch):
-        self.miner_id = miner_id
-        self.sender_wallet = sender_wallet
-        self.max_price = max_price
-        self.verified_deal = verified_deal
-        self.fast_retrieval = fast_retrieval
-        self.epoch_interval_hours = epoch_interval_hours
-        self.start_epoch = start_epoch

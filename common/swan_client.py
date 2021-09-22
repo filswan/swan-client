@@ -16,7 +16,7 @@ task_type_regular = "regular"
 class SwanTask:
     miner_id = None
 
-    def __init__(self, task_name: str, curated_dataset: str, description: str, is_public: bool, is_verified: bool,bid_mode: int,fast_retrieval:bool,max_price:str):
+    def __init__(self, task_name: str, curated_dataset: str, description: str, is_public: bool, is_verified: bool,bid_mode: int,fast_retrieval:bool,max_price:str,expire_days:int):
         self.task_name = task_name
         self.curated_dataset = curated_dataset
         self.description = description
@@ -25,6 +25,7 @@ class SwanTask:
         self.bid_mode = bid_mode
         self.fast_retrieval = fast_retrieval
         self.max_price = max_price
+        self.expire_days = expire_days
 
     def to_request_dict(self):
         return {
@@ -36,7 +37,8 @@ class SwanTask:
             'miner_id': self.miner_id if self.miner_id else '',
             'fast_retrieval':self.fast_retrieval,
             'bid_mode': self.bid_mode,
-            'max_price': self.max_price
+            'max_price': self.max_price,
+            'expire_days': self.expire_days
         }
 
 
