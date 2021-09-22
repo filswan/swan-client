@@ -26,15 +26,16 @@ class DealConfig:
     verified_deal = None
     fast_retrieval = None
     epoch_interval_hours = None
+    start_epoch = None
 
-    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours):
+    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours,start_epoch):
         self.miner_id = miner_id
         self.sender_wallet = sender_wallet
         self.max_price = max_price
         self.verified_deal = verified_deal
         self.fast_retrieval = fast_retrieval
         self.epoch_interval_hours = epoch_interval_hours
-
+        self.start_epoch = start_epoch
 
 def get_current_epoch_by_current_time():
     current_timestamp = int(time.time())
@@ -95,7 +96,7 @@ def propose_offline_deal(_price, _cost, piece_size, data_cid, piece_cid, deal_co
     return deal_cid, start_epoch
 
 def propose_offline_deals(_price, _cost, piece_size, data_cid, piece_cid, deal_conf: DealConfig, skip_confirmation: bool):
-    start_epoch = deal_conf.epoch_interval_hours
+    start_epoch = get_current_epoch_by_current_time() + deal_conf.start_epoch
     command = ['lotus', 'client', 'deal', '--from', deal_conf.sender_wallet, '--start-epoch', str(start_epoch),
                '--fast-retrieval=' + str(deal_conf.fast_retrieval).lower(), '--verified-deal=' + str(deal_conf.verified_deal).lower(),
                '--manual-piece-cid', piece_cid, '--manual-piece-size', piece_size, data_cid, deal_conf.miner_id, _cost,
