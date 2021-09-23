@@ -567,7 +567,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
     metadata_output_csv_path = os.path.join(output_dir, task_info["uuid"] + "-assigned"+".csv")
     output_csv_path = os.path.join(output_dir, task_info["uuid"] + ".csv")
 
-    with open(output_csv_path, "w") as output_csv_file:
+    with open(metadata_output_csv_path, "w") as output_csv_file:
         output_fieldnames = ['uuid', 'miner_id', 'deal_cid', 'file_source_url', 'md5', 'start_epoch', 'payload_cid','piece_cid','file_size']
         csv_writer = csv.DictWriter(output_csv_file, delimiter=',', fieldnames=output_fieldnames)
         csv_writer.writeheader()
@@ -601,8 +601,9 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
                 'deal_cid': deal["deal_cid"]
             }
             csv_writer.writerow(csv_data)
+    return metadata_output_csv_path
 
-def update_assigned_task(config_path, task_uuid, assigned_miner_id):
+def update_assigned_task(config_path, task_uuid, metadata_output_csv_path):
     config = read_config(config_path)
     api_url = config['main']['api_url']
     api_key = config['main']['api_key']
@@ -625,13 +626,16 @@ def update_assigned_task(config_path, task_uuid, assigned_miner_id):
         jwt_token_expiration = payload['exp']
     except Exception as e:
         logging.info(str(e))
-    logging.info('Getting My swan tasks info')
+    logging.info('Updating Swan task.')
+
     get_task_url_suffix = '/tasks/'
     get_task_method = 'PUT'
 
     get_task_url = api_url + get_task_url_suffix + task_uuid
     payload_data = {"status":"DealSent"}
-    resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
+    with open(metadata_output_csv_path, 'r') as deal_csvfile:
+        resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data,deal_csvfile)
+    logging.info('Swan task updated.')
     return resp
 
 
