@@ -190,10 +190,9 @@ if __name__ == '__main__':
                 tasks_dict = get_tasks(config_path)
                 for task in tasks_dict["Assigned tasks"]:
                     assigned_task = check_task_status(task["uuid"],config_path)
-                    assigned_bid = assigned_task["won_bid"]
                     assigned_task_info= assigned_task["task"]
-                    if assigned_bid and assigned_task_info:
-                        assigned_miner_id = assigned_bid["swan_user_info"]["miners"][0]['miner_id']
+                    if assigned_task_info:
+                        assigned_miner_id = assigned_task_info['miner_id']
                         deals = assigned_task['deals']
                         send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
                         update_assigned_task(config_path, assigned_task_info['uuid'], assigned_miner_id)

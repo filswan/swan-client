@@ -366,7 +366,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
             deal = OfflineDeal()
             for attr in row.keys():
                 deal.__setattr__(attr, row.get(attr))
-                deal.start_epoch = (start_epoch + 1) * EPOCH_PER_HOUR
+                deal.start_epoch = get_current_epoch_by_current_time() + (start_epoch + 1) * EPOCH_PER_HOUR
             deal_list.append(deal)
 
     # generate_car(deal_list, output_dir)
@@ -414,16 +414,10 @@ def check_task_status(task_uuid,config_path):
     payload_data = ""
     resp=send_http_request(get_task_url, get_task_method,None, payload_data)
     task_status = resp["task"]["status"]
-    bids = resp["bid"]
     deals = resp['deal']
     task = resp['task']
-    won_bid = {}
-    for bid in bids:
-        if bid['status'] == 'Assigned':
-            won_bid = bid
-            break
 
-    task_bid_dict ={'task_uuid':task_uuid,'task_status':task_status,'bids':bids,'won_bid':won_bid,'deals':deals,'task':task}
+    task_bid_dict ={'task_uuid':task_uuid,'task_status':task_status,'deals':deals,'task':task}
     logging.info('Swan task status is: %s'% json.dumps(task_bid_dict))
     return task_bid_dict
 
@@ -504,7 +498,7 @@ def get_tasks(config_path):
     tasks = resp['task']
     assigned_task_list=[]
     for task in tasks:
-        if task["status"] == 'Assigned':
+        if task["status"] == 'Assigned' and task["miner_id"]:
             assigned_task_list.append(task)
     assigned_task_dict={'Assigned tasks': assigned_task_list}
     return assigned_task_dict
@@ -525,10 +519,10 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
                 price = prices['price']
         from_wallet = config['sender']['wallet']
         max_price = task_info["max_price"]
-        fast_retrieval = _deal['fast_retrieval']
+        fast_retrieval = task_info['fast_retrieval']
         start_epoch = _deal['start_epoch']
         skip_confirmation = True
-        deal_config = DealConfig(miner_id, from_wallet, max_price, task_info["type"], fast_retrieval, start_epoch)
+        deal_config = DealConfig(miner_id, from_wallet, max_price, task_info["type"], fast_retrieval,"", start_epoch)
 
         if Decimal(price).compare(Decimal(max_price)) > 0:
             logging.warning(

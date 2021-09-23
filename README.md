@@ -8,6 +8,7 @@ Client Tool provides the following functions:
 * Propose deals based on the metadata CSV file.
 * Generate a final CSV file contains deal CIDs and miner id for miner to import deals.
 * Create tasks on Swan Platform.
+* Send deal automatically to auto-bid miners.
 
 
 ## Basic Concept
@@ -17,8 +18,8 @@ Client Tool provides the following functions:
 In swan project, a task can contain multiple offline deals. There are two basic type of tasks:
 
 - Public Task
-    * A public task is a deal set for open bid. After bidder win the bid, the task holder needs to propose the task to the winner.
-- Private Task
+    * A public task is a deal set for open bid. If the bid mode is set to manuall,after bidder win the bid, the task holder needs to propose the task to the winner. If the bid mode is set to auto-bid, the task will be automatically assigned to a selected miner based on reputation system and Market Matcher.
+- Private Task. 
     * A private task is used to propose deals to a specified miner.
 
 ### Offline Deal
@@ -60,6 +61,7 @@ path = "/download"
 gateway_address = "/ip4/127.0.0.1/tcp/8080"
 
 [sender]
+bid_mode = 1
 offline_mode = false
 output_dir = "/tmp/tasks"
 public_deal = true
@@ -70,6 +72,7 @@ generate_md5 = false
 wallet = ""
 max_price = "0"
 start_epoch_hours = 96
+expire_days = 4
 ```
 
 #### main
@@ -95,6 +98,7 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 
 #### sender
 
+- **bid_mode:** [0/1] Default 1. If it is set to 1, autobid mode is on which means public tasks posted will receive automatically bids from miners and tasks will be sent automatically after auto bids. In contrast, 0 represents the manual mode as public tasks need to be bid manually by miners and sent manually.
 - **offline_mode:** [true/false] Default false. If it is set to true, you will not be able to create Swan task on filswan.com, but you can still create CSVs and Car Files for sending deals
 - **output_dir:** Output directory for saving generated Car files and CSVs
 
@@ -106,6 +110,7 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 - **wallet:**  Wallet used for sending offline deals
 - **max_price:** Max price willing to pay per GiB/epoch for offline deal
 - **start_epoch_hours:** start_epoch for deals in hours from current time
+- **expired_days** start_epoch for deals in hours from current time
 
 ### Installation:
 #### Ubuntu/Debian
@@ -299,7 +304,7 @@ Two CSV files are generated after successfully running the command: task-name.cs
 [task-name.csv] is a CSV generated for posting a task on Swan platform or transferring to miners directly for offline import
 
 ```
-miner_id,deal_cid,file_source_url,md5,start_epoch
+uuid,miner_id,deal_cid,file_source_url,md5,start_epoch,piece_cid
 ```
 
 [task-name-metadata.csv] contains more content for creating proposal in the next step
@@ -318,7 +323,7 @@ python3 swan_cli.py deal --csv [metadata_csv_dir/task-name-metadata.csv] --out-d
 **--csv (Required):** File path to the metadata CSV file. Mandatory metadata CSV fields: source_file_size, car_file_url, data_cid,
 piece_cid
 
-**--out-dir (optional)** Swan deal final CSV will be generated to the given directory. Default: output_dir specified in config.toml
+**--out-dir (optional):** Swan deal final CSV will be generated to the given directory. Default: output_dir specified in config.toml
 
 **--miner (Required):** Target miner id, e.g f01276
 
@@ -343,3 +348,11 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTQzNzA5ODcsImlhdCI6MTYxNDI4NDU
 INFO:root:Updating Swan task.
 INFO:root:Swan task updated.
 ```
+
+### Step 4. Auto send auto-bid mode tasks with deals to auto-bid mode miner
+The autobid system between swan-client and swan-provider allows you to automatically send deals to a miner selected by Swan platform. All miners with auto-bid mode on have the chance to be selected but only one will be chosen based on Swan reputation system and Market Matcher. 
+```
+python3 swan_cli.py auto --out-dir [output_file_dir] 
+```
+**--out-dir (optional):** Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml
+
