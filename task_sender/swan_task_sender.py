@@ -514,15 +514,29 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         price = 0
         if prices:
             if task_info["type"]:
-                price = prices['verified_price']
+                if task_info["type"] == 'verified':
+                    price = prices['verified_price']
             else:
                 price = prices['price']
         from_wallet = config['sender']['wallet']
         max_price = task_info["max_price"]
         fast_retrieval = task_info['fast_retrieval']
+        if fast_retrieval:
+            if fast_retrieval == 1:
+                fast_retrieval = "true"
+        else:
+            fast_retrieval = "false"
+        task_type = task_info['type']
+        if task_type:
+            if task_info["type"] == 'verified':
+                task_type = "true"
+            else:
+                task_type = 'false'
+        else:
+            task_type = 'false'
         start_epoch = _deal['start_epoch']
         skip_confirmation = True
-        deal_config = DealConfig(miner_id, from_wallet, max_price, task_info["type"], fast_retrieval,"", start_epoch)
+        deal_config = DealConfig(miner_id, from_wallet, max_price, task_type, fast_retrieval,"", start_epoch)
 
         if Decimal(price).compare(Decimal(max_price)) > 0:
             logging.warning(
@@ -541,7 +555,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
             _deal_cid, _start_epoch = propose_offline_deals(price, str(cost), str(piece_size), data_cid, piece_cid,
                                                        deal_config, skip_confirmation)
         if _deal_cid:
-            deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal.car_file_md5,'file_source_url': _deal.car_file_url})
+            deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"]})
 
     ## save task csv
     output_dir = out_dir
@@ -550,7 +564,27 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
+    metadata_output_csv_path = os.path.join(output_dir, task_info["uuid"] + "-assigned"+".csv")
     output_csv_path = os.path.join(output_dir, task_info["uuid"] + ".csv")
+
+    with open(output_csv_path, "w") as output_csv_file:
+        output_fieldnames = ['uuid', 'miner_id', 'deal_cid', 'file_source_url', 'md5', 'start_epoch', 'payload_cid','piece_cid','file_size']
+        csv_writer = csv.DictWriter(output_csv_file, delimiter=',', fieldnames=output_fieldnames)
+        csv_writer.writeheader()
+
+        for deal in deals_list:
+            csv_data = {
+                'uuid': deal["uuid"],
+                'miner_id': deal["miner_id"],
+                'deal_cid': deal["deal_cid"],
+                'file_source_url': deal["file_source_url"],
+                'md5': deal["md5"],
+                'start_epoch': deal["start_epoch"],
+                'payload_cid': deal["payload_cid"],
+                'piece_cid': deal["piece_cid"],
+                'file_size': deal["file_size"]
+            }
+            csv_writer.writerow(csv_data)
 
     with open(output_csv_path, "w") as output_csv_file:
         output_fieldnames = ['uuid', 'miner_id', 'file_source_url', 'md5', 'start_epoch', 'deal_cid']
@@ -559,12 +593,12 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
 
         for deal in deals_list:
             csv_data = {
-                'uuid': deal.uuid,
-                'miner_id': deal.miner_id,
-                'file_source_url': deal.car_file_url,
-                'md5': deal.car_file_md5,
-                'start_epoch': deal.start_epoch,
-                'deal_cid': deal.deal_cid
+                'uuid': deal["uuid"],
+                'miner_id': deal["miner_id"],
+                'file_source_url': deal["file_source_url"],
+                'md5': deal["md5"],
+                'start_epoch': deal["start_epoch"],
+                'deal_cid': deal["deal_cid"]
             }
             csv_writer.writerow(csv_data)
 
@@ -596,7 +630,7 @@ def update_assigned_task(config_path, task_uuid, assigned_miner_id):
     get_task_method = 'PUT'
 
     get_task_url = api_url + get_task_url_suffix + task_uuid
-    payload_data = {"status":"DealSent","miner_id":assigned_miner_id}
+    payload_data = {"status":"DealSent"}
     resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
     return resp
 
