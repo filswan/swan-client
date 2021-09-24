@@ -265,7 +265,7 @@ python3 swan_cli.py task --input-dir [car_files_dir] --out-dir [output_files_dir
 
 **--dataset (optional)** The curated dataset from which the Car files are generated
 
-**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to know.
+**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to be informed.
 
 The output will be like:
 ```shell
@@ -307,7 +307,7 @@ swan-task-uuid
 
 **--dataset (optional)** The curated dataset from which the Car files are generated
 
-**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to know.
+**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to be informed
 
 Two CSV files are generated after successfully running the command: task-name.csv, task-name-metadata.csv.
 
