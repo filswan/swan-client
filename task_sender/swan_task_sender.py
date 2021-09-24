@@ -555,9 +555,9 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
             _deal_cid, _start_epoch = propose_offline_deals(price, str(cost), str(piece_size), data_cid, piece_cid,
                                                        deal_config, skip_confirmation)
         if _deal_cid:
-            deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"]})
+            deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"],'payload_cid': _deal["payload_cid"],"file_size":_deal["file_size"],'piece_cid':_deal["piece_cid"]})
 
-    ## save task csv
+    ## save assigned metadata csv
     output_dir = out_dir
     if not out_dir:
         output_dir = config['sender']['output_dir']
@@ -586,6 +586,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
             }
             csv_writer.writerow(csv_data)
 
+    ## save task csv
     with open(output_csv_path, "w") as output_csv_file:
         output_fieldnames = ['uuid', 'miner_id', 'file_source_url', 'md5', 'start_epoch', 'deal_cid']
         csv_writer = csv.DictWriter(output_csv_file, delimiter=',', fieldnames=output_fieldnames)
