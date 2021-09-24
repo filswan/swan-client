@@ -110,7 +110,7 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 - **wallet:**  Wallet used for sending offline deals
 - **max_price:** Max price willing to pay per GiB/epoch for offline deal
 - **start_epoch_hours:** start_epoch for deals in hours from current time
-- **expired_days** start_epoch for deals in hours from current time
+- **expired_days:** expected completion days for miner sealing data 
 
 ### Installation:
 #### Ubuntu/Debian
@@ -257,6 +257,15 @@ in config.toml: set public_deal = false
 ```shell
 python3 swan_cli.py task --input-dir [car_files_dir] --out-dir [output_files_dir] --miner [miner_id] --dataset [curated_dataset] --description [description]
 ```
+**--input-dir (Required)** Input directory where the generated car files and car.csv are located
+
+**--out-dir (optional)** Metadata CSV and Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml
+
+**--miner (Required)** Miner Id you want to send private deal to
+
+**--dataset (optional)** The curated dataset from which the Car files are generated
+
+**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to know.
 
 The output will be like:
 ```shell
@@ -298,6 +307,7 @@ swan-task-uuid
 
 **--dataset (optional)** The curated dataset from which the Car files are generated
 
+**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to know.
 
 Two CSV files are generated after successfully running the command: task-name.csv, task-name-metadata.csv.
 
@@ -348,11 +358,3 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTQzNzA5ODcsImlhdCI6MTYxNDI4NDU
 INFO:root:Updating Swan task.
 INFO:root:Swan task updated.
 ```
-
-### Step 4. Auto send auto-bid mode tasks with deals to auto-bid mode miner
-The autobid system between swan-client and swan-provider allows you to automatically send deals to a miner selected by Swan platform. All miners with auto-bid mode on have the chance to be selected but only one will be chosen based on Swan reputation system and Market Matcher. 
-```
-python3 swan_cli.py auto --out-dir [output_file_dir] 
-```
-**--out-dir (optional):** Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml
-
