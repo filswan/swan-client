@@ -269,6 +269,7 @@ def upload_car_files(input_dir, config_path):
     else:
         gateway_address = config['ipfs-server']['gateway_address']
         gateway_ip, gateway_port = SwanClient.parseMultiAddr(gateway_address)
+        api_ip, api_port = SwanClient.parseMultiAddr(gateway_address)
         car_files_list: List[CarFile] = []
         car_csv_path = input_dir + "/car.csv"
         with open(car_csv_path, "r") as csv_file:
@@ -281,9 +282,10 @@ def upload_car_files(input_dir, config_path):
                 car_files_list.append(car_file)
         for car_file in car_files_list:
             logging.info("Uploading car file %s" % car_file.car_file_name)
-            car_file_hash = SwanClient.upload_car_to_ipfs(car_file.car_file_path)
-            car_file.car_file_address = "http://" + gateway_ip + ":" + gateway_port + "/ipfs/" + car_file_hash
-            logging.info("Car file %s uploaded: %s" % (car_file.car_file_name ,car_file.car_file_address))
+            car_file_hash = SwanClient.upload_car_to_ipfs(car_file.car_file_path,api_ip,api_port)
+            if car_file_hash:
+                car_file.car_file_address = "http://" + gateway_ip + ":" + gateway_port + "/ipfs/" + car_file_hash
+                logging.info("Car file %s uploaded: %s" % (car_file.car_file_name ,car_file.car_file_address))
 
         with open(car_csv_path, "w") as csv_file:
             csv_writer = csv.DictWriter(csv_file, delimiter=',', fieldnames=attributes)

@@ -138,17 +138,16 @@ class SwanClient:
 
         send_http_request(url, update_offline_deal_details_method, self.jwt_token, body)
 
-    def upload_car_to_ipfs(car_file_path: str):
-        cmd = "ipfs add " + car_file_path + " | grep added"
+    def upload_car_to_ipfs(car_file_path: str,gateway_ip:str,gateway_port:str):
         try:
-            pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = pipe.communicate()
-            if stdout == b'':
-                logging.error("Upload file to ipfs server failed.")
-                return None
-            stdout = stdout.decode("utf-8")
-            # ipfs add output example: added QmU5bGL6gBRr4ShxQLv9hq97SvrEFAU1uea3FE17QGpdbS file
-            car_file_hash = stdout.split(" ")[1]
+            gateway_address = "http://" + gateway_ip + ":" + gateway_port + "/api/v0/add?stream-channels=true&pin=true"
+            with open(car_file_path, "rb") as a_file:
+                file_dict = {"file": a_file}
+                response = requests.post(gateway_address, files=file_dict)
+                if not response:
+                    logging.error("Upload file to ipfs server failed.")
+                    return None
+                car_file_hash = response.json()['Hash']
             return car_file_hash
 
         except Exception as error:

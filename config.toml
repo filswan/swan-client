@@ -10,7 +10,8 @@ port = 443
 path = "/download"
 
 [ipfs-server]
-gateway_address = "/ip4/127.0.0.1/tcp/8080"
+gateway_address = "/ip4/192.168.88.41/tcp/5050"
+api_address = "/ip4/192.168.88.41/tcp/5001"
 
 [sender]
 bid_mode = 1
