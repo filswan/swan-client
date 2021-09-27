@@ -430,7 +430,6 @@ def get_assigned_tasks(config_path):
     api_key = config['main']['api_key']
     access_token = config['main']['access_token']
 
-    logging.info('Refreshing token')
     refresh_api_token_suffix = "/user/api_keys/jwt"
     refresh_api_token_method = 'POST'
 
