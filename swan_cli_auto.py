@@ -14,6 +14,8 @@ if __name__ == '__main__':
                         help='Automatically send autobid deals')
 
     parser.add_argument('--out-dir', dest='out_dir', help="Path to the dir to metadata csv and task csv")
+    parser.add_argument('--config', dest='config_path', default="./config.toml",
+                        help="Path to the config file (default: ./config.toml)")
 
     args = parser.parse_args()
 
