@@ -8,7 +8,7 @@ import time
 import logging
 from miner_updater.swan_miner_updater import update_miner_info
 from task_sender.deal_sender import send_deals
-from task_sender.swan_task_sender import create_new_task, update_task_by_uuid, generate_car_files, go_generate_car_files,upload_car_files,check_task_status,assign_bid,get_tasks,send_autobid_deal,update_assigned_task
+from task_sender.swan_task_sender import create_new_task, update_task_by_uuid, generate_car_files, go_generate_car_files,upload_car_files
 
 
 def random_hash(length=6):
@@ -152,54 +152,10 @@ if __name__ == '__main__':
 
         update_miner_info(miner_id, config_path)
 
-    elif args.__getattribute__('function') == "status":
-        task_uuid = args.__getattribute__('task_uuid')
-        if not task_uuid:
-            print('Please provide --task')
-            exit(1)
-        task_bid_dict = check_task_status(task_uuid,config_path)
 
 
-    elif args.__getattribute__('function') == "assign":
-        won_bid_id = args.__getattribute__('bid_id')
-        if not won_bid_id:
-            print('Please provide --bid')
-            exit(1)
-        task_uuid = args.__getattribute__('task_uuid')
-        if not task_uuid:
-            print('Please provide --task')
-            exit(1)
-        miner_id = args.__getattribute__('miner_id')
-        if not miner_id:
-            print('Please provide --miner')
-            exit(1)
-        metadata_csv_path = args.__getattribute__('metadata_csv_path')
-        if not metadata_csv_path:
-            print('Please provide --csv')
-            exit(1)
-        metadata_csv_path = os.path.abspath(metadata_csv_path)
-        with open(metadata_csv_path, 'r') as csvfile:
-            reader = csv.reader(csvfile)
-            column = [row[0] for row in reader]
-            assigned_bid = assign_bid(task_uuid,won_bid_id,miner_id,config_path,csvfile)
 
-    elif args.__getattribute__('function') == "auto":
-        out_dir = args.__getattribute__('out_dir')
-        while True:
-            try:
-                tasks_dict = get_tasks(config_path)
-                for task in tasks_dict["Assigned tasks"]:
-                    assigned_task = check_task_status(task["uuid"],config_path)
-                    assigned_task_info= assigned_task["task"]
-                    if assigned_task_info:
-                        assigned_miner_id = assigned_task_info['miner_id']
-                        deals = assigned_task['deals']
-                        metadata_output_csv_path = send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
-                        update_assigned_task(config_path, assigned_task_info['uuid'], metadata_output_csv_path)
-                time.sleep(30)
-            except Exception as e:
-                logging.error(e)
-                time.sleep(30)
+
 
 
 

@@ -358,3 +358,10 @@ eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2MTQzNzA5ODcsImlhdCI6MTYxNDI4NDU
 INFO:root:Updating Swan task.
 INFO:root:Swan task updated.
 ```
+
+### Step 4. Auto send auto-bid mode tasks with deals to auto-bid mode miner
+The autobid system between swan-client and swan-provider allows you to automatically send deals to a miner selected by Swan platform. All miners with auto-bid mode on have the chance to be selected but only one will be chosen based on Swan reputation system and Market Matcher.
+```
+python3 swan_cli_auto.py auto --out-dir [output_file_dir] 
+```
+**--out-dir (optional):** A new metadata csv and a Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml

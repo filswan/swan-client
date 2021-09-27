@@ -406,7 +406,7 @@ def create_new_task(input_dir, out_dir, config_path, task_name, curated_dataset,
     generate_metadata_csv(deal_list, task, output_dir, task_uuid)
     generate_csv_and_send(task, deal_list, output_dir, client, task_uuid)
 
-def check_task_status(task_uuid,config_path):
+def get_task_info(task_uuid,config_path):
     config = read_config(config_path)
     api_url = config['main']['api_url']
     logging.info('Getting Swan task status, uuid: %s' % task_uuid)
@@ -424,46 +424,7 @@ def check_task_status(task_uuid,config_path):
     logging.info('Swan task status is: %s'% json.dumps(task_bid_dict))
     return task_bid_dict
 
-def assign_bid(task_uuid,won_bid_id,miner_id,config_path,csvfile):
-    config = read_config(config_path)
-    api_url = config['main']['api_url']
-    api_key = config['main']['api_key']
-    access_token = config['main']['access_token']
-
-    logging.info('Refreshing token')
-    refresh_api_token_suffix = "/user/api_keys/jwt"
-    refresh_api_token_method = 'POST'
-
-    refresh_token_url = api_url + refresh_api_token_suffix
-    data = {
-        "apikey": api_key,
-        "access_token": access_token
-    }
-    jwt_token=""
-    try:
-        resp_data = send_http_request(refresh_token_url, refresh_api_token_method, None, json.dumps(data))
-        jwt_token = resp_data['jwt']
-        payload = jwt.decode(jwt=jwt_token, verify=False, algorithm='HS256')
-        jwt_token_expiration = payload['exp']
-    except Exception as e:
-        logging.info(str(e))
-    print(jwt_token)
-    logging.info('Getting Swan task status: %s' % task_uuid)
-    get_task_url_suffix = '/tasks/'
-    get_task_method = 'PUT'
-
-    get_task_url = api_url + get_task_url_suffix + task_uuid
-    payload_data = {
-        "won_bid_id": won_bid_id,
-        "miner_id":miner_id
-    }
-    jwt_token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJleHAiOjE2NjMzNzY5MjAsImlhdCI6MTYzMTg0MDkyMCwic3ViIjoxODR9.TVNaM3rut0cuG0zClUgde5sY38yNRNomOHV3Oeiw4Oc"
-    resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data)
-    assigned_task_uuid= resp["task_uuid"]
-    logging.info('Swan task status of %s is assigned to bid %s'%(assigned_task_uuid,won_bid_id))
-    return assigned_task_uuid
-
-def get_tasks(config_path):
+def get_assigned_tasks(config_path):
     config = read_config(config_path)
     api_url = config['main']['api_url']
     api_key = config['main']['api_key']
