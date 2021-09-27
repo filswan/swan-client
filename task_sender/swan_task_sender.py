@@ -527,10 +527,11 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
 
     Path(output_dir).mkdir(parents=True, exist_ok=True)
 
-    metadata_output_csv_path = os.path.join(output_dir, task_info["uuid"] + "-assigned"+".csv")
-    output_csv_path = os.path.join(output_dir, task_info["uuid"] + ".csv")
+    info_output_csv_path = os.path.join(output_dir, task_info["uuid"] + "-info"+".csv")
+    output_csv_path = os.path.join(output_dir, task_info["uuid"] + "-deals.csv")
 
-    with open(metadata_output_csv_path, "w") as output_csv_file:
+    logging.info("Swan deal info CSV Generated: %s" % info_output_csv_path)
+    with open(info_output_csv_path, "w") as output_csv_file:
         output_fieldnames = ['uuid', 'miner_id', 'deal_cid', 'file_source_url', 'md5', 'start_epoch', 'payload_cid','piece_cid','file_size']
         csv_writer = csv.DictWriter(output_csv_file, delimiter=',', fieldnames=output_fieldnames)
         csv_writer.writeheader()
@@ -550,6 +551,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
             csv_writer.writerow(csv_data)
 
     ## save task csv
+    logging.info("Swan deal final CSV Generated: %s" % output_csv_path)
     with open(output_csv_path, "w") as output_csv_file:
         output_fieldnames = ['uuid', 'miner_id', 'file_source_url', 'md5', 'start_epoch', 'deal_cid']
         csv_writer = csv.DictWriter(output_csv_file, delimiter=',', fieldnames=output_fieldnames)

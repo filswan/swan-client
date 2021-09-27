@@ -6,9 +6,9 @@ Client Tool provides the following functions:
 * Generate Car files from downloaded source files with or without Lotus.
 * Generate metadata e.g. Car file URI, start epoch, etc. and save them to a metadata CSV file.
 * Propose deals based on the metadata CSV file.
-* Generate a final CSV file contains deal CIDs and miner id for miner to import deals.
+* Generate a final CSV file contains deal CIDs and storage provider id for storage provider to import deals.
 * Create tasks on Swan Platform.
-* Send deal automatically to auto-bid miners.
+* Send deal automatically to auto-bid storage providers.
 
 
 ## Basic Concept
@@ -18,9 +18,9 @@ Client Tool provides the following functions:
 In swan project, a task can contain multiple offline deals. There are two basic type of tasks:
 
 - Public Task
-    * A public task is a deal set for open bid. If the bid mode is set to manuall,after bidder win the bid, the task holder needs to propose the task to the winner. If the bid mode is set to auto-bid, the task will be automatically assigned to a selected miner based on reputation system and Market Matcher.
+    * A public task is a deal set for open bid. If the bid mode is set to manuall,after bidder win the bid, the task holder needs to propose the task to the winner. If the bid mode is set to auto-bid, the task will be automatically assigned to a selected storage provider based on reputation system and Market Matcher.
 - Private Task. 
-    * A private task is used to propose deals to a specified miner.
+    * A private task is used to propose deals to a specified storage provider.
 
 ### Offline Deal
 
@@ -86,19 +86,19 @@ true in [sender] section
 
 #### web-server
 
-web-server is used to upload generated Car files. Miner will download Car files from this web-server.
+web-server is used to upload generated Car files. Storage provider will download Car files from this web-server.
 The downloadable URL in the CSV file is built with the following format: host+port+path+filename,
 e.g. http://nbai.io:8080/download/<filename>
 
 #### ipfs-server
 
-ipfs-server is used to upload generated Car files. Miner will download Car files from this ipfs-server.
+ipfs-server is used to upload generated Car files. Storage provider will download Car files from this ipfs-server.
 The downloadable URL in the CSV file is built with the following format: host+port+ipfs+hash,
 e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 
 #### sender
 
-- **bid_mode:** [0/1] Default 1. If it is set to 1, autobid mode is on which means public tasks posted will receive automatically bids from miners and tasks will be sent automatically after auto bids. In contrast, 0 represents the manual mode as public tasks need to be bid manually by miners and sent manually.
+- **bid_mode:** [0/1] Default 1. If it is set to 1, autobid mode is on which means public tasks posted will receive automatically bids from storage providers and tasks will be sent automatically after auto bids. In contrast, 0 represents the manual mode as public tasks need to be bid manually by storage providers and sent manually.
 - **offline_mode:** [true/false] Default false. If it is set to true, you will not be able to create Swan task on filswan.com, but you can still create CSVs and Car Files for sending deals
 - **output_dir:** Output directory for saving generated Car files and CSVs
 
@@ -110,7 +110,7 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 - **wallet:**  Wallet used for sending offline deals
 - **max_price:** Max price willing to pay per GiB/epoch for offline deal
 - **start_epoch_hours:** start_epoch for deals in hours from current time
-- **expired_days:** expected completion days for miner sealing data 
+- **expired_days:** expected completion days for storage provider sealing data 
 
 ### Installation:
 #### Ubuntu/Debian
@@ -255,17 +255,17 @@ INFO:root:Car file [car_file] uploaded: http://127.0.0.1:8080/ipfs/QmPrQPfGCAHwY
 in config.toml: set public_deal = false
 
 ```shell
-python3 swan_cli.py task --input-dir [car_files_dir] --out-dir [output_files_dir] --miner [miner_id] --dataset [curated_dataset] --description [description]
+python3 swan_cli.py task --input-dir [car_files_dir] --out-dir [output_files_dir] --miner [Storage_provider_id] --dataset [curated_dataset] --description [description]
 ```
 **--input-dir (Required)** Input directory where the generated car files and car.csv are located
 
 **--out-dir (optional)** Metadata CSV and Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml
 
-**--miner (Required)** Miner Id you want to send private deal to
+**--miner (Required)** Storage provider Id you want to send private deal to
 
 **--dataset (optional)** The curated dataset from which the Car files are generated
 
-**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to be informed.
+**--description (optional)** Details to better describe the data and confine the task or anything the storage provider needs to be informed.
 
 The output will be like:
 ```shell
@@ -307,11 +307,11 @@ swan-task-uuid
 
 **--dataset (optional)** The curated dataset from which the Car files are generated
 
-**--description (optional)** Details to better describe the data and confine the task or anything the miner needs to be informed
+**--description (optional)** Details to better describe the data and confine the task or anything the storage provider needs to be informed
 
 Two CSV files are generated after successfully running the command: task-name.csv, task-name-metadata.csv.
 
-[task-name.csv] is a CSV generated for posting a task on Swan platform or transferring to miners directly for offline import
+[task-name.csv] is a CSV generated for posting a task on Swan platform or transferring to storage providers directly for offline import
 
 ```
 uuid,miner_id,deal_cid,file_source_url,md5,start_epoch,piece_cid
@@ -323,11 +323,11 @@ uuid,miner_id,deal_cid,file_source_url,md5,start_epoch,piece_cid
 uuid,source_file_name,source_file_path,source_file_md5,source_file_url,source_file_size,car_file_name,car_file_path,car_file_md5,car_file_url,car_file_size,deal_cid,data_cid,piece_cid,miner_id,start_epoch
 ```
 
-2. Propose offline deal after miner win the bid. Client needs to use the metadata CSV generated in the previous step
-   for sending the offline deals to the miner.
+2. Propose offline deal after one storage provider win the bid. Client needs to use the metadata CSV generated in the previous step
+   for sending the offline deals to the storage provider.
 
 ```
-python3 swan_cli.py deal --csv [metadata_csv_dir/task-name-metadata.csv] --out-dir [output_files_dir] --miner [miner_id]
+python3 swan_cli.py deal --csv [metadata_csv_dir/task-name-metadata.csv] --out-dir [output_files_dir] --miner [storage_provider_id]
 ```
 
 **--csv (Required):** File path to the metadata CSV file. Mandatory metadata CSV fields: source_file_size, car_file_url, data_cid,
@@ -335,18 +335,18 @@ piece_cid
 
 **--out-dir (optional):** Swan deal final CSV will be generated to the given directory. Default: output_dir specified in config.toml
 
-**--miner (Required):** Target miner id, e.g f01276
+**--miner (Required):** Target storage provider id, e.g f01276
 
 A csv with name [task-name]-metadata-deals.csv is generated under the output directory, it contains the deal cid and
-miner id for miner to process on Swan platform. You could re-upload this file to Swan platform while assign bid to miner or do a
+storage provider id for the provider to process on Swan platform. You could re-upload this file to Swan platform while assign bid to storage provider or do a
 private deal.
 
 The output will be like:
 
 ```shell
-INFO:root:['lotus', 'client', 'deal', '--from', 'f3ufzpudvsjqyiholpxiqoomsd2svy26jvy4z4pzodikgovkhkp6ioxf5p4jbpnf7tgyg67dny4j75e7og7zeq', '--start-epoch', '544243', '--manual-piece-cid', 'baga6ea4seaqcqjelghbfwy2r6fxsffzfv6gs2gyvc75crxxltiscpajfzk6csii', '--manual-piece-size', '66584576', 'bafykbzaceb6dtpjjisy5pzwksrxwfothlmfjtmcjj7itsvw2flpp5co5ikxam', 'f019104', '0.000000000000000000', '1051200']
+INFO:root:['lotus', 'client', 'deal', '--from', 'f3ufzpudvsjqyiholpxiqoomsd2svy26jvy4z4pzodikgovkhkp6ioxf5p4jbpnf7tgyg67dny4j75e7og7zeq', '--start-epoch', '544243', '--manual-piece-cid', 'baga6ea4seaqcqjelghbfwy2r6fxsffzfv6gs2gyvc75crxxltiscpajfzk6csii', '--manual-piece-size', '66584576', 'bafykbzaceb6dtpjjisy5pzwksrxwfothlmfjtmcjj7itsvw2flpp5co5ikxam', 't01101', '0.000000000000000000', '1051200']
 INFO:root:wallet: f3ufzpudvsjqyiholpxiqoomsd2svy26jvy4z4pzodikgovkhkp6ioxf5p4jbpnf7tgyg67dny4j75e7og7zeq
-INFO:root:miner: f019104
+INFO:root:miner: t01101
 INFO:root:price: 0
 INFO:root:total cost: 0.000000000000000000
 INFO:root:start epoch: 544243
@@ -359,12 +359,12 @@ INFO:root:Updating Swan task.
 INFO:root:Swan task updated.
 ```
 
-### Step 4. Auto send auto-bid mode tasks with deals to auto-bid mode miner
+### Step 4. Auto send auto-bid mode tasks with deals to auto-bid mode storage provider
 The autobid system between swan-client and swan-provider allows you to automatically send deals to a miner selected by Swan platform. All miners with auto-bid mode on have the chance to be selected but only one will be chosen based on Swan reputation system and Market Matcher. You can choose to start this service before or after creating tasks in Step 3. Noted here, only public tasks with `bid_mode` set to `1` will be considered. A log file will be generated afterwards. 
 ```
 nohup python3 swan_cli_auto.py auto --out-dir [output_file_dir] >> auto_deal.log &
 ```
-**--out-dir (optional):** A new metadata csv and a Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml
+**--out-dir (optional):** A deal info csv containing information of deals sent and a corresponding deal final CSV with deals details will be generated to the given directory. Default: output_dir specified in config.toml
 
 The output will be like:
 ```shell
@@ -372,15 +372,17 @@ INFO:root:Getting My swan tasks info
 INFO:root:Swan task count 203
 INFO:root:Getting Swan task status, uuid: 9c330c9-ba7-4989-b0a-7b9f26602
 INFO:root:Swan task status is: {"task_uuid": "9c330c9-ba7-4989-b0a-7b9f26602", "task_status": "Assigned", "deals": [{"contract_id": "0x5210ED929B5BEdBFFBA", "created_at": "1632762298", "deal_cid": null, "file_name": null, "file_path": null, "file_size": "103125", "file_source_url": "http://192.168.88.41:5050/ipfs/QmZAiNYWX8giAYnUrZXVowtBwVktKL8meBjf", "id": 6861, "md5_origin": "", "miner_id": null, "note": null, "payload_cid": "bafk2bzacebjglrfqg3eexbntnhke2zysfmdwkfnlankhq72fca3w2c", "piece_cid": "baga6ea4seaqa2nfklf5xgom5jelt75czi3i5ynhiwm2b5w3xfs", "start_epoch": 1160167, "status": "Created", "task_id": 1596, "updated_at": "1632762298", "user_id": 184}], "task": {"bid_mode": 1, "created_on": "1632762298", "curated_dataset": null, "description": null, "expire_days": 4, "fast_retrieval": 1, "is_public": 1, "max_price": "0.050000000000000000", "min_price": null, "miner_id": "t03354", "status": "Assigned", "tags": null, "task_file_name": "test.csv", "task_id": 1596, "task_name": "2021092702", "type": "regular", "updated_on": "\ufffd", "uuid": "9c3b30c9-ba17-4989-b03a-7b9f26602036"}}
-INFO:root:['lotus', 'client', 'deal', '--from', 't3u7pumush376xbytsgs5wabkhtadjzfydxxda2vzyasg7cimkcphswrq66j4dubbhwpnojqd3jie6ermpwvvq', '--start-epoch', '320167', '--fast-retrieval=true', '--verified-deal=false', '--manual-piece-cid', 'baga6ea4seaqa2nfklf5xgom5jelt75czi3i5ynhiwm2b5w3xfsp7thnkfzgnmdq', '--manual-piece-size', '130048', 'bafk2bzacebjglrfqg3eexbntnhke2zysfmdwkfnlankhq72fca3w2c2dqq5j2', 't03354', '0.000000000000000000', '1051200']
+INFO:root:['lotus', 'client', 'deal', '--from', 't3u7pumush376xbytsgs5wabkhtadjzfydxxda2vzyasg7cimkcphswrq66j4dubbhwpnojqd3jie6ermpwvvq', '--start-epoch', '320167', '--fast-retrieval=true', '--verified-deal=false', '--manual-piece-cid', 'baga6ea4seaqa2nfklf5xgom5jelt75czi3i5ynhiwm2b5w3xfsp7thnkfzgnmdq', '--manual-piece-size', '130048', 'bafk2bzacebjglrfqg3eexbntnhke2zysfmdwkfnlankhq72fca3w2c2dqq5j2', 't01101, '0.000000000000000000', '1051200']
 INFO:root:wallet: umush376xbyabkhtadjzfydxxda2vzyasg7cimkcphswrq66j4dubbh
-INFO:root:miner: t03354
+INFO:root:miner: t01101
 INFO:root:price: 0
 INFO:root:total cost: 0.000000000000000000
 INFO:root:start epoch: 320167
 INFO:root:fast-retrieval: true
 INFO:root:verified-deal: false
 INFO:root:Deal sent, deal cid: bafyrei2yuidanaxzsp3yvypxub5worfei5tojb55fd, start epoch: 320167
+INFO:root:Swan deal info CSV Generated: /tmp/tasks/[output_files_dir]/task-uuid-info.csv
+INFO:root:Swan deal final CSV /tmp/tasks/[output_files_dir]/task-uuid-deals.csv
 INFO:root:Refreshing token
 INFO:root:Updating Swan task.
 INFO:root:Swan task updated.

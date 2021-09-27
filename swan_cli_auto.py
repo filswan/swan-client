@@ -34,8 +34,8 @@ if __name__ == '__main__':
                     if assigned_task_info:
                         assigned_miner_id = assigned_task_info['miner_id']
                         deals = assigned_task['deals']
-                        metadata_output_csv_path = send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
-                        update_assigned_task(config_path, assigned_task_info['uuid'], metadata_output_csv_path)
+                        info_output_csv_path = send_autobid_deal(deals,assigned_miner_id,assigned_task_info,config_path,out_dir)
+                        update_assigned_task(config_path, assigned_task_info['uuid'], info_output_csv_path)
                 time.sleep(30)
             except Exception as e:
                 logging.error(e)
