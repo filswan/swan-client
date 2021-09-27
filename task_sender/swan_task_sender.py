@@ -569,7 +569,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
             csv_writer.writerow(csv_data)
     return metadata_output_csv_path
 
-def update_assigned_task(config_path, task_uuid, metadata_output_csv_path):
+def update_assigned_task(config_path, task_uuid, info_output_csv_path):
     config = read_config(config_path)
     api_url = config['main']['api_url']
     api_key = config['main']['api_key']
@@ -599,7 +599,7 @@ def update_assigned_task(config_path, task_uuid, metadata_output_csv_path):
 
     get_task_url = api_url + get_task_url_suffix + task_uuid
     payload_data = {"status":"DealSent"}
-    with open(metadata_output_csv_path, 'r') as deal_csvfile:
+    with open(info_output_csv_path, 'r') as deal_csvfile:
         resp=send_http_request(get_task_url, get_task_method,jwt_token, payload_data,deal_csvfile)
     logging.info('Swan task updated.')
     return resp
