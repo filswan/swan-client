@@ -567,7 +567,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
                 'deal_cid': deal["deal_cid"]
             }
             csv_writer.writerow(csv_data)
-    return metadata_output_csv_path
+    return info_output_csv_path
 
 def update_assigned_task(config_path, task_uuid, info_output_csv_path):
     config = read_config(config_path)
