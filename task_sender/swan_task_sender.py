@@ -285,7 +285,7 @@ def upload_car_files(input_dir, config_path):
             logging.info("Uploading car file %s" % car_file.car_file_name)
             car_file_hash = SwanClient.upload_car_to_ipfs(car_file.car_file_path,api_ip,api_port)
             if car_file_hash:
-                car_file.car_file_address = "https://" + gateway_ip + ":" + gateway_port + "/ipfs/" + car_file_hash
+                car_file.car_file_address = "http://" + gateway_ip + ":" + gateway_port + "/ipfs/" + car_file_hash
                 logging.info("Car file %s uploaded: %s" % (car_file.car_file_name ,car_file.car_file_address))
 
         with open(car_csv_path, "w") as csv_file:
