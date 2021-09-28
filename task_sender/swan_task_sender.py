@@ -269,8 +269,6 @@ def upload_car_files(input_dir, config_path):
     else:
         gateway_address = config['ipfs-server']['gateway_address']
         api_address = config['ipfs-server']['api_address']
-        gateway_ip, gateway_port = SwanClient.parseMultiAddr(gateway_address)
-        api_ip, api_port = SwanClient.parseMultiAddr(api_address)
         car_files_list: List[CarFile] = []
         car_csv_path = input_dir + "/car.csv"
         with open(car_csv_path, "r") as csv_file:
@@ -283,9 +281,9 @@ def upload_car_files(input_dir, config_path):
                 car_files_list.append(car_file)
         for car_file in car_files_list:
             logging.info("Uploading car file %s" % car_file.car_file_name)
-            car_file_hash = SwanClient.upload_car_to_ipfs(car_file.car_file_path,api_ip,api_port)
+            car_file_hash = SwanClient.upload_car_to_ipfs(car_file.car_file_path,api_address)
             if car_file_hash:
-                car_file.car_file_address = "http://" + gateway_ip + ":" + gateway_port + "/ipfs/" + car_file_hash
+                car_file.car_file_address = gateway_address + "/ipfs/" + car_file_hash
                 logging.info("Car file %s uploaded: %s" % (car_file.car_file_name ,car_file.car_file_address))
 
         with open(car_csv_path, "w") as csv_file:
@@ -474,13 +472,17 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         piece_cid = _deal["piece_cid"]
         file_size = _deal["file_size"]
         prices = get_miner_price(miner_id)
-        price = 0
+        price = None
         if prices:
             if task_info["type"]:
                 if task_info["type"] == 'verified':
                     price = prices['verified_price']
             else:
                 price = prices['price']
+        else:
+            logging.warning(
+                "Did not find price for miner %s" % miner_id)
+            return None
         from_wallet = config['sender']['wallet']
         max_price = task_info["max_price"]
         fast_retrieval = task_info['fast_retrieval']

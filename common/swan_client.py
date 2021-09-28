@@ -138,9 +138,9 @@ class SwanClient:
 
         send_http_request(url, update_offline_deal_details_method, self.jwt_token, body)
 
-    def upload_car_to_ipfs(car_file_path: str,api_ip:str,api_port:str):
+    def upload_car_to_ipfs(car_file_path: str,api_ip_address:str):
         try:
-            gateway_address = "http://" + api_ip + ":" + api_port + "/api/v0/add?stream-channels=true&pin=true"
+            gateway_address = api_ip_address + "/api/v0/add?stream-channels=true&pin=true"
             with open(car_file_path, "rb") as a_file:
                 file_dict = {"file": a_file}
                 response = requests.post(gateway_address, files=file_dict)
