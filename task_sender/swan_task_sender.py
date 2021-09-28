@@ -267,8 +267,8 @@ def upload_car_files(input_dir, config_path):
     if storage_server_type == "web server":
         logging.info("Please upload car files to web server manually.")
     else:
-        gateway_address = config['ipfs-server']['gateway_address']
-        api_address = config['ipfs-server']['api_address']
+        gateway_address = config['ipfs-server']['download_stream_url']
+        api_address = config['ipfs-server']['upstream_url']
         car_files_list: List[CarFile] = []
         car_csv_path = input_dir + "/car.csv"
         with open(car_csv_path, "r") as csv_file:

@@ -58,8 +58,8 @@ port = 443
 path = "/download"
 
 [ipfs-server]
-gateway_address = "http://127.0.0.1:8080"
-api_address = "http://127.0.0.1:5001"
+upstream_url = "http://127.0.0.1:5001"
+download_stream_url = "http://127.0.0.1:8080"
 
 [sender]
 bid_mode = 1
