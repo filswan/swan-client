@@ -472,13 +472,12 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         piece_cid = _deal["piece_cid"]
         file_size = _deal["file_size"]
         prices = get_miner_price(miner_id)
-        price = None
         if prices:
             if task_info["type"]:
                 if task_info["type"] == 'verified':
-                    price = prices['verified_price']
+                    real_price = prices['verified_price']
             else:
-                price = prices['price']
+                real_price = prices['price']
         else:
             logging.warning(
                 "Did not find price for miner %s" % miner_id)
@@ -503,9 +502,9 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         skip_confirmation = True
         deal_config = DealConfig(miner_id, from_wallet, max_price, task_type, fast_retrieval,"", start_epoch)
 
-        if Decimal(price).compare(Decimal(max_price)) > 0:
+        if Decimal(real_price).compare(Decimal(max_price)) > 0:
             logging.warning(
-                "miner %s price %s higher than max price %s" % (miner_id, price, max_price))
+                "miner %s price %s higher than max price %s" % (miner_id, real_price, max_price))
         sector_size = None
         if file_size:
             if int(file_size) > 0:
@@ -514,10 +513,10 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
                 logging.error("file is too small")
         cost = None
         if sector_size:
-            cost = f'{calculate_real_cost(sector_size, price):.18f}'
+            cost = f'{calculate_real_cost(sector_size, real_price):.18f}'
         _deal_cid = None
         if cost:
-            _deal_cid, _start_epoch = propose_offline_deals(price, str(cost), str(piece_size), data_cid, piece_cid,
+            _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
                                                        deal_config, skip_confirmation)
         if _deal_cid:
             deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"],'payload_cid': _deal["payload_cid"],"file_size":_deal["file_size"],'piece_cid':_deal["piece_cid"]})

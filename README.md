@@ -93,7 +93,7 @@ e.g. http://nbai.io:8080/download/<filename>
 
 #### ipfs-server
 
-ipfs-server is used to upload generated Car files. Storage provider will download Car files from this ipfs-server.
+ipfs-server is used to upload and download generated Car files. You can upload generated Car files via `upstream_url` and storage provider will download Car files from this ipfs-server using `download_stream_url`.
 The downloadable URL in the CSV file is built with the following format: host+port+ipfs+hash,
 e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 

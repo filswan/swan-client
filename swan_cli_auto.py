@@ -38,7 +38,6 @@ if __name__ == '__main__':
                         if info_output_csv_path:
                             update_assigned_task(config_path, assigned_task_info['uuid'], info_output_csv_path)
                         else:
-
                             continue
                 time.sleep(30)
             except Exception as e:
