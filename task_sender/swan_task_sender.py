@@ -472,7 +472,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         piece_cid = _deal["piece_cid"]
         file_size = _deal["file_size"]
         prices = get_miner_price(miner_id)
-        real_price = None
+        real_price = -1
         if prices:
             if task_info["type"]:
                 if task_info["type"] == 'verified':
