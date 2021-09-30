@@ -25,9 +25,12 @@ In swan project, a task can contain multiple offline deals. There are two basic 
 ### Offline Deal
 
 The size of an offline deal can be up to 64 GB. It is suggested to create a CSV file contains the following information: 
-uuid|miner_id|deal_cid|file_source_url|md5|start_epoch
-------------|-------------|-------------|-------------|-------------|-------------
-0b89e0cf-f3ec-41a3-8f1e-52b098f0c503|f047419|bafyreid7tw7mcwlj465dqudwanml3mueyzizezct6cm5a7g2djfxjfgxwm|http://download.com/downloads/fil.tar.car| |544835
+uuid|miner_id|deal_cid|payload_cid|file_source_url|md5|start_epoch|piece_cid|file_size
+
+For example:
+```
+0b89e0cf-f3ec-41a3-8f1e-52b098f0c503|f047419|---|bafyreid7tw7mcwlj465dqudwanml3mueyzizezct6cm5a7g2djfxjfgxwm|http://download.com/downloads/fil.tar.car|---|544835|baga6ea4seaqeqlfnuhfawhw6rm53t24znnuw76ycfuqvpw4c7olnxpju4la4qfq|122877455
+```
 
 This CSV file is helpful to enhance the data consistency and rebuild the graph in the future. 
 uuid is generated for future index purpose.
@@ -211,7 +214,7 @@ INFO:root:Data CID: bafykbzacebbq4g73e4he32ahyynnamrft2tva2jyjt5fsxfqv76anptmyoa
 INFO:root:Car files output dir: [car_files_output_dir]
 INFO:root:Please upload car files to web server or ipfs server.
 ```
-If --out-dir is not provided, then the output directory for the car files will be: output_dir (specified in the configuration file) + a random uuid
+If `--out-dir` is not provided, then the output directory for the car files will be: `output_dir` (specified in the configuration file) + a random uuid
 
 For example: /tmp/tasks/7f33a9d6-47d0-4635-b152-5e380733bf09
 
@@ -239,28 +242,28 @@ Credits should be given to filedrive-team. More information can be found in http
 
 After the car files are generated, you need to copy the files to a web-server manually, or you can upload the files to local ipfs server.
 
-If you decide to upload the files to local ipfs server:
+If you decide to upload the files to an open ipfs server:
 ```shell
 python3 swan_cli.py upload --input-dir [input_file_dir]
 ```
 The output will be like:
 ```shell
 INFO:root:Uploading car file [car_file]
-INFO:root:Car file [car_file] uploaded: http://127.0.0.1:8080/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
+INFO:root:Car file [car_file] uploaded: https://OpenIpfsHost:Port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 ```
 
 ### Step 3. Create a task
 
 #### Options 1: Private Task
 
-in config.toml: set public_deal = false
+in `config.toml`: set `public_deal = false`
 
 ```shell
 python3 swan_cli.py task --input-dir [car_files_dir] --out-dir [output_files_dir] --miner [Storage_provider_id] --dataset [curated_dataset] --description [description]
 ```
 **--input-dir (Required)** Input directory where the generated car files and car.csv are located
 
-**--out-dir (optional)** Metadata CSV and Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml
+**--out-dir (optional)** Metadata CSV and Swan task CSV will be generated to the given directory. Default: `output_dir` specified in config.toml
 
 **--miner (Required)** Storage provider Id you want to send private deal to
 
@@ -290,7 +293,7 @@ INFO:root:New Swan task Generated.
 
 #### Options 2: Public Task
 
-in config.toml: set public_deal = true
+in `config.toml`: set `public_deal = true`
 
 1. Generate the public task
 
@@ -298,10 +301,9 @@ in config.toml: set public_deal = true
 python3 swan_cli.py task --input-dir [car_files_dir] --out-dir [output_files_dir] --name [task_name] --dataset [curated_dataset] --description [description]
 ```
 
-**--input-dir (Required)** Each file under this directory will be converted to a Car file, the generated car file will be located
-under the output folder defined in config.toml
+**--input-dir (Required)** Input directory where the generated car files and car.csv are located
 
-**--out-dir (optional)** Metadata CSV and Swan task CSV will be generated to the given directory. Default: output_dir specified in config.toml 
+**--out-dir (optional)** Metadata CSV and Swan task CSV will be generated to the given directory. Default: `output_dir` specified in config.toml 
 
 **--name (optional)** Given task name while creating task on Swan platform. Default:
 swan-task-uuid
@@ -315,7 +317,7 @@ Two CSV files are generated after successfully running the command: task-name.cs
 [task-name.csv] is a CSV generated for posting a task on Swan platform or transferring to storage providers directly for offline import
 
 ```
-uuid,miner_id,deal_cid,file_source_url,md5,start_epoch,piece_cid
+uuid,miner_id,deal_cid,payload_cid,file_source_url,md5,start_epoch,piece_cid,file_size
 ```
 
 [task-name-metadata.csv] contains more content for creating proposal in the next step
@@ -327,7 +329,7 @@ uuid,source_file_name,source_file_path,source_file_md5,source_file_url,source_fi
 2. Propose offline deal after one storage provider win the bid. Client needs to use the metadata CSV generated in the previous step
    for sending the offline deals to the storage provider.
 
-```
+```shell
 python3 swan_cli.py deal --csv [metadata_csv_dir/task-name-metadata.csv] --out-dir [output_files_dir] --miner [storage_provider_id]
 ```
 
@@ -361,11 +363,17 @@ INFO:root:Swan task updated.
 ```
 
 ### Step 4. Auto send auto-bid mode tasks with deals to auto-bid mode storage provider
-The autobid system between swan-client and swan-provider allows you to automatically send deals to a miner selected by Swan platform. All miners with auto-bid mode on have the chance to be selected but only one will be chosen based on Swan reputation system and Market Matcher. You can choose to start this service before or after creating tasks in Step 3. Noted here, only public tasks with `bid_mode` set to `1` will be considered. A log file will be generated afterwards. 
+The autobid system between swan-client and swan-provider allows you to automatically send deals to a miner selected by Swan platform. All miners with auto-bid mode on have the chance to be selected but only one will be chosen based on Swan reputation system and Market Matcher. You can choose to start this service before or after creating tasks in Step 3. Noted here, only tasks with `bid_mode` set to `1` and `public_deal` set to `true` will be considered. A log file will be generated afterwards. 
+
+Start the autobid module:
+```shell
+python3 swan_cli_auto.py auto --out-dir [output_file_dir]
+```
+or (Recommanded)
 ```
 nohup python3 swan_cli_auto.py auto --out-dir [output_file_dir] >> auto_deal.log &
 ```
-**--out-dir (optional):** A deal info csv containing information of deals sent and a corresponding deal final CSV with deals details will be generated to the given directory. Default: output_dir specified in config.toml
+**--out-dir (optional):** A deal info csv containing information of deals sent and a corresponding deal final CSV with deals details will be generated to the given directory. Default: `output_dir` specified in config.toml
 
 The output will be like:
 ```shell
