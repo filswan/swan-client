@@ -32,7 +32,6 @@ In swan project, a task can contain multiple offline deals. There are two basic 
 The size of an offline deal can be up to 64 GB. It is suggested to create a CSV file contains the following information: 
 uuid|miner_id|deal_cid|payload_cid|file_source_url|md5|start_epoch|piece_cid|file_size
 ------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------|-------------
-
 0b89e0cf-f3ec-41a3-8f1e-52b098f0c503|f047419|---|bafyreid7tw7mcwlj465dqudwanml3mueyzizezct6cm5a7g2djfxjfgxwm|http://download.com/downloads/fil.tar.car|---|544835|baga6ea4seaqeqlfnuhfawhw6rm53t24znnuw76ycfuqvpw4c7olnxpju4la4qfq|122877455
 
 
