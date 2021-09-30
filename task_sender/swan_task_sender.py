@@ -484,7 +484,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         else:
             logging.warning(
                 "Did not find price for miner %s" % miner_id)
-            return None
+            continue
         from_wallet = config['sender']['wallet']
         max_price = task_info["max_price"]
         fast_retrieval = task_info['fast_retrieval']
@@ -515,24 +515,16 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
                 piece_size, sector_size = calculate_piece_size_from_file_size(file_size)
             else:
                 logging.error("file is too small")
+                continue
         cost = None
         if sector_size:
             cost = f'{calculate_real_cost(sector_size, real_price):.18f}'
-        _deal_cid = None
-        if cost:
-            _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
+
+        _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
                                                        deal_config, skip_confirmation)
-        if _deal_cid:
-            deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"],'payload_cid': _deal["payload_cid"],"file_size":_deal["file_size"],'piece_cid':_deal["piece_cid"]})
-        else:
-            for i in range(3):
-                time.sleep(30)
-                _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
-                                                                deal_config, skip_confirmation)
-                if _deal_cid:
-                    break
-            if not _deal_cid:
-                return None
+
+        deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"],'payload_cid': _deal["payload_cid"],"file_size":_deal["file_size"],'piece_cid':_deal["piece_cid"]})
+
     ## save assigned metadata csv
     output_dir = out_dir
     if not out_dir:

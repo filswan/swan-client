@@ -25,7 +25,7 @@ In swan project, a task can contain multiple offline deals. There are two basic 
   * Created: Tasks are created successfully first time on Swan platform or tasks with `ActionRequired` status have been modified to fullfill the autobid qualification.
   * Assigned: Tasks have been assigned to storage providers manually by users or automatically by autobid module.
   * ActionRequired: Task with autobid mode on,in other words,`bid_mode` set to `1` and `public_deal` set to `true`, have some information missing or invalid in the [task-name.csv],which cause the failure of automatically assigning storage providers. Action are required to fill in or modify the file and then update the task information on Swan platform with the new csv file.
-  * DealSent: Tasks have been sent to storage providers after task being assigned.
+  * DealSent: Tasks have been sent to storage providers after tasks being assigned.
   
 ### Offline Deal
 
@@ -401,11 +401,11 @@ INFO:root:Swan task updated.
 ```
 
 ####Note:
-A succesful autobid task will go through three major status - `Created`,`Assigned` and `DealSent`.
+A successful autobid task will go through three major status - `Created`,`Assigned` and `DealSent`.
 The task status `ActionRequired` exists only when public task with autobid mode on failed in meeting the requirements of autobid.
 To avoid being set to `ActionRequired`, a task must be created or modified to have valid tasks and corresponding deals information as following.  
 
-- For task:
+- **For task**:
 
   **task price:** Max price willing to pay per GiB/epoch for offline deal,which can be changed in `max_price` of `config.toml`
 
@@ -413,7 +413,8 @@ To avoid being set to `ActionRequired`, a task must be created or modified to ha
 
   **task type:** [true/false] Whether deals in the tasks are public deals, which can be changed in `fast_retreval` of `config.toml`
 
-- For deals:
+- **For deals**:
+  
   **valid deals:** There must be at least one valid corresponding deal record. Check the [task-name.csv] to make sure of it.
 
   **start epoch** Start epoch for deals in hours from current time is also needed, which can be changed in `start_epoch_hours` of `config.toml`
