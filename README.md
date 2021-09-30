@@ -16,12 +16,17 @@ Client Tool provides the following functions:
 ### Task
 
 In swan project, a task can contain multiple offline deals. There are two basic type of tasks:
-
-- Public Task
+- Task type
+  * Public Task
     * A public task is a deal set for open bid. If the bid mode is set to manuall,after bidder win the bid, the task holder needs to propose the task to the winner. If the bid mode is set to auto-bid, the task will be automatically assigned to a selected storage provider based on reputation system and Market Matcher.
-- Private Task. 
+  * Private Task. 
     * A private task is used to propose deals to a specified storage provider.
-
+- Task status:
+  * Created: Tasks are created successfully first time on Swan platform or tasks with `ActionRequired` status have been modified to fullfill the autobid qualification.
+  * Assigned: Tasks have been assigned to storage providers manually by users or automatically by autobid module.
+  * ActionRequired: Task with autobid mode on,in other words,`bid_mode` set to `1` and `public_deal` set to `true`, have some information missing or invalid in the [task-name.csv],which cause the failure of automatically assigning storage providers. Action are required to fill in or modify the file and then update the task information on Swan platform with the new csv file.
+  * DealSent: Tasks have been sent to storage providers after task being assigned.
+  
 ### Offline Deal
 
 The size of an offline deal can be up to 64 GB. It is suggested to create a CSV file contains the following information: 
@@ -396,3 +401,29 @@ INFO:root:Refreshing token
 INFO:root:Updating Swan task.
 INFO:root:Swan task updated.
 ```
+
+####Note:
+A succesful autobid task will go through three major status - `Created`,`Assigned` and `DealSent`.
+The task status `ActionRequired` exists only when public task with autobid mode on failed in meeting the requirements of autobid.
+To avoid being set to `ActionRequired`, a task must be created or modified to have valid tasks and corresponding deals information as following.  
+
+- For task:
+
+  **task price:** Max price willing to pay per GiB/epoch for offline deal,which can be changed in `max_price` of `config.toml`
+
+  **task fast retrieval:** [true/false] Indicates that data should be available for fast retrieval,which can be changed in `fast_retreval` of `config.toml`
+
+  **task type:** [true/false] Whether deals in the tasks are public deals, which can be changed in `fast_retreval` of `config.toml`
+
+- For deals:
+  **valid deals:** There must be at least one valid corresponding deal record. Check the [task-name.csv] to make sure of it.
+
+  **start epoch** Start epoch for deals in hours from current time is also needed, which can be changed in `start_epoch_hours` of `config.toml`
+
+  **car file urls:** The valid downloading url of car files must be filled in before creating Swan tasks. Check column `car_file_url` of car.csv before sending and modify it if needed.
+
+  **car file size:** A correct car file size should be filled in [car.csv] after car files generation
+
+  **Payload Cid** Also known as data cid, which should be given in [car.csv] after car files generation.
+
+  **Piece Cid** Piece cid is required for offline deals,which should be given in [car.csv] after car files generation as well.
