@@ -461,6 +461,7 @@ def get_assigned_tasks(config_path):
     for task in tasks:
         if task["status"] == 'Assigned' and task["miner_id"]:
             assigned_task_list.append(task)
+    logging.info('Assigned autobid Swan task count %s'%str(len(assigned_task_list)))
     assigned_task_dict={'Assigned tasks': assigned_task_list}
     return assigned_task_dict
 
