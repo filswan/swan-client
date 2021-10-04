@@ -115,8 +115,6 @@ def propose_offline_deals(_price, _cost, piece_size, data_cid, piece_cid, deal_c
         logging.info("fast-retrieval: %s" % str(deal_conf.fast_retrieval).lower())
         logging.info("verified-deal: %s" % str(deal_conf.verified_deal).lower())
         logging.info('Deal sent, deal cid: %s, start epoch: %s' % (deal_cid, start_epoch))
-    else:
-        logging.info('Deal sent failure: start epoch: %s'%(start_epoch))
     return deal_cid, start_epoch
 
 # https://docs.filecoin.io/store/lotus/very-large-files/#maximizing-storage-per-sector

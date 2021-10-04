@@ -528,6 +528,8 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
                 break
             else:
                 i = i+1
+        if not _deal_cid:
+            logging.info('Sending deal failure: deal id %s'%(_deal["id"]))
 
     ## save assigned metadata csv
     output_dir = out_dir
