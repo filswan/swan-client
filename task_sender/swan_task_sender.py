@@ -519,6 +519,7 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         cost = None
         if sector_size:
             cost = f'{calculate_real_cost(sector_size, real_price):.18f}'
+        i=0
         while i < 60:
             _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
                                                            deal_config, skip_confirmation,i)
