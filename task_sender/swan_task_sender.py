@@ -519,11 +519,14 @@ def send_autobid_deal(deals,miner_id,task_info,config_path,out_dir):
         cost = None
         if sector_size:
             cost = f'{calculate_real_cost(sector_size, real_price):.18f}'
-
-        _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
-                                                       deal_config, skip_confirmation)
-
-        deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"],'payload_cid': _deal["payload_cid"],"file_size":_deal["file_size"],'piece_cid':_deal["piece_cid"]})
+        while i < 60:
+            _deal_cid, _start_epoch = propose_offline_deals(real_price,str(cost), str(piece_size), data_cid, piece_cid,
+                                                           deal_config, skip_confirmation,i)
+            if _deal_cid:
+                deals_list.append({"deal_cid":_deal_cid,"start_epoch":_start_epoch,"uuid":task_info['uuid'],'miner_id': miner_id,'md5': _deal["md5_origin"],'file_source_url': _deal["file_source_url"],'payload_cid': _deal["payload_cid"],"file_size":_deal["file_size"],'piece_cid':_deal["piece_cid"]})
+                break
+            else:
+                i = i+1
 
     ## save assigned metadata csv
     output_dir = out_dir

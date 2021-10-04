@@ -400,7 +400,7 @@ INFO:root:Updating Swan task.
 INFO:root:Swan task updated.
 ```
 
-####Note:
+#### Note:
 A successful autobid task will go through three major status - `Created`,`Assigned` and `DealSent`.
 The task status `ActionRequired` exists only when public task with autobid mode on failed in meeting the requirements of autobid.
 To avoid being set to `ActionRequired`, a task must be created or modified to have valid tasks and corresponding deals information as following.  

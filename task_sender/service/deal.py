@@ -95,9 +95,9 @@ def propose_offline_deal(_price, _cost, piece_size, data_cid, piece_cid, deal_co
     logging.info('Deal sent, deal cid: %s, start epoch: %s' % (deal_cid, start_epoch))
     return deal_cid, start_epoch
 
-def propose_offline_deals(_price, _cost, piece_size, data_cid, piece_cid, deal_conf: DealConfig, skip_confirmation: bool):
+def propose_offline_deals(_price, _cost, piece_size, data_cid, piece_cid, deal_conf: DealConfig, skip_confirmation: bool, epoch:int):
     logging.info("Sending task deals ...")
-    start_epoch = deal_conf.start_epoch
+    start_epoch = deal_conf.start_epoch - epoch
     command = ['lotus', 'client', 'deal', '--from', deal_conf.sender_wallet, '--start-epoch', str(start_epoch),
                '--fast-retrieval=' + str(deal_conf.fast_retrieval).lower(), '--verified-deal=' + str(deal_conf.verified_deal).lower(),
                '--manual-piece-cid', piece_cid, '--manual-piece-size', piece_size, data_cid, deal_conf.miner_id, _cost,
