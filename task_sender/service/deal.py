@@ -102,20 +102,21 @@ def propose_offline_deals(_price, _cost, piece_size, data_cid, piece_cid, deal_c
                '--fast-retrieval=' + str(deal_conf.fast_retrieval).lower(), '--verified-deal=' + str(deal_conf.verified_deal).lower(),
                '--manual-piece-cid', piece_cid, '--manual-piece-size', piece_size, data_cid, deal_conf.miner_id, _cost,
                DURATION]
-    logging.info(command)
-    logging.info("wallet: %s" % deal_conf.sender_wallet)
-    logging.info("miner: %s" % deal_conf.miner_id)
-    logging.info("price: %s" % _price)
-    logging.info("total cost: %s" % _cost)
-    logging.info("start epoch: %s" % start_epoch)
-    logging.info("fast-retrieval: %s" % str(deal_conf.fast_retrieval).lower())
-    logging.info("verified-deal: %s" % str(deal_conf.verified_deal).lower())
-    if not skip_confirmation:
-        input("Press Enter to continue...")
     proc = subprocess.Popen(command, stdout=subprocess.PIPE)
     resp = proc.stdout.readline().rstrip().decode('utf-8')
     deal_cid = resp
-    logging.info('Deal sent, deal cid: %s, start epoch: %s' % (deal_cid, start_epoch))
+    if deal_cid:
+        logging.info(command)
+        logging.info("wallet: %s" % deal_conf.sender_wallet)
+        logging.info("miner: %s" % deal_conf.miner_id)
+        logging.info("price: %s" % _price)
+        logging.info("total cost: %s" % _cost)
+        logging.info("start epoch: %s" % start_epoch)
+        logging.info("fast-retrieval: %s" % str(deal_conf.fast_retrieval).lower())
+        logging.info("verified-deal: %s" % str(deal_conf.verified_deal).lower())
+        logging.info('Deal sent, deal cid: %s, start epoch: %s' % (deal_cid, start_epoch))
+    else:
+        logging.info('Deal sent failure: start epoch: %s'%(start_epoch))
     return deal_cid, start_epoch
 
 # https://docs.filecoin.io/store/lotus/very-large-files/#maximizing-storage-per-sector
