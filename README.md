@@ -417,12 +417,12 @@ To avoid being set to `ActionRequired`, a task must be created or modified to ha
   
   **valid deals:** There must be at least one valid corresponding deal record. Check the [task-name.csv] to make sure of it.
 
-  **start epoch** Start epoch for deals in hours from current time is also needed, which can be changed in `start_epoch_hours` of `config.toml`
+  **start epoch:** Start epoch for deals in hours from current time is also needed, which can be changed in `start_epoch_hours` of `config.toml`
 
   **car file urls:** The valid downloading url of car files must be filled in before creating Swan tasks. Check column `car_file_url` of car.csv before sending and modify it if needed.
 
   **car file size:** A correct car file size should be filled in [car.csv] after car files generation
 
-  **Payload Cid** Also known as data cid, which should be given in [car.csv] after car files generation.
+  **Payload Cid:** Also known as data cid, which should be given in [car.csv] after car files generation.
 
-  **Piece Cid** Piece cid is required for offline deals,which should be given in [car.csv] after car files generation as well.
+  **Piece Cid:** Piece cid is required for offline deals,which should be given in [car.csv] after car files generation as well.

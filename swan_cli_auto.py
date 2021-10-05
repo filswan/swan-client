@@ -27,7 +27,7 @@ if __name__ == '__main__':
         out_dir = args.__getattribute__('out_dir')
         while True:
             try:
-                logging.info('Autobid scan start')
+                logging.info('Autobid scan start at %s'% int(time.time()))
                 tasks_dict = get_assigned_tasks(config_path)
                 for task in tasks_dict["Assigned tasks"]:
                     assigned_task = get_task_info(task["uuid"],config_path)
