@@ -14,6 +14,7 @@ def send_deals(config_path, miner_id, task_name=None, metadata_csv_path=None, de
     fast_retrieval = config['sender']['fast_retrieval']
     epoch_interval_hours = config['sender']['start_epoch_hours']
     skip_confirmation = config['sender']['skip_confirmation']
+
     output_dir = out_dir
     if not out_dir:
         output_dir = config['sender']['output_dir']
@@ -26,3 +27,6 @@ def send_deals(config_path, miner_id, task_name=None, metadata_csv_path=None, de
         return send_deals_to_miner(deal_config, output_dir, skip_confirmation, csv_file_path=metadata_csv_path, task_uuid=task_uuid)
     else:
         logging.error("no valid deal list or metadata_csv provided")
+
+
+

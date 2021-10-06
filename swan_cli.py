@@ -4,6 +4,8 @@ import random
 import string
 import csv
 import subprocess
+import time
+import logging
 from miner_updater.swan_miner_updater import update_miner_info
 from task_sender.deal_sender import send_deals
 from task_sender.swan_task_sender import create_new_task, update_task_by_uuid, generate_car_files, go_generate_car_files,upload_car_files
@@ -18,8 +20,8 @@ def random_hash(length=6):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Swan client')
 
-    parser.add_argument('function', metavar='task/deal', choices=['task', 'deal', 'miner', 'car', 'upload','gocar','keygen','encrypt','decrypt'], type=str, nargs="?",
-                        help='Create new Swan task/Send deal/Update miner info/Generate car file')
+    parser.add_argument('function', metavar='task/deal', choices=['task', 'deal', 'miner', 'car', 'upload','gocar','keygen','encrypt','decrypt','status', 'assign','auto'], type=str, nargs="?",
+                        help='Create new Swan task/Send deal/Update miner info/Generate car file/Get task status')
 
     parser.add_argument('--config', dest='config_path', default="./config.toml",
                         help="Path to the config file (default: ./config.toml)")
@@ -43,8 +45,9 @@ if __name__ == '__main__':
     parser.add_argument('--input-encrypted-file', dest='input_encrypted_file', help="Input encrypted file")
     parser.add_argument('--out-decrypted-file', dest='out_decrypted_file', help="Output decrypted file")
     parser.add_argument('--key_file', dest='key_file', help="Input file with .key extention where encrypted password is restored for encryption and decryption")
-    
-    
+
+    parser.add_argument('--task', dest='task_uuid', help="Get task status by uuid.")
+    parser.add_argument('--bid', dest='bid_id', help="Bid id")
 
     args = parser.parse_args()
 
@@ -148,3 +151,12 @@ if __name__ == '__main__':
             exit(1)
 
         update_miner_info(miner_id, config_path)
+
+
+
+
+
+
+
+
+

@@ -26,15 +26,16 @@ class DealConfig:
     verified_deal = None
     fast_retrieval = None
     epoch_interval_hours = None
+    start_epoch = None
 
-    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours):
+    def __init__(self, miner_id, sender_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours,start_epoch):
         self.miner_id = miner_id
         self.sender_wallet = sender_wallet
         self.max_price = max_price
         self.verified_deal = verified_deal
         self.fast_retrieval = fast_retrieval
         self.epoch_interval_hours = epoch_interval_hours
-
+        self.start_epoch = start_epoch
 
 def get_current_epoch_by_current_time():
     current_timestamp = int(time.time())
@@ -94,6 +95,27 @@ def propose_offline_deal(_price, _cost, piece_size, data_cid, piece_cid, deal_co
     logging.info('Deal sent, deal cid: %s, start epoch: %s' % (deal_cid, start_epoch))
     return deal_cid, start_epoch
 
+def propose_offline_deals(_price, _cost, piece_size, data_cid, piece_cid, deal_conf: DealConfig, skip_confirmation: bool, epoch:int):
+    logging.info("Sending task deals ...")
+    start_epoch = deal_conf.start_epoch - epoch
+    command = ['lotus', 'client', 'deal', '--from', deal_conf.sender_wallet, '--start-epoch', str(start_epoch),
+               '--fast-retrieval=' + str(deal_conf.fast_retrieval).lower(), '--verified-deal=' + str(deal_conf.verified_deal).lower(),
+               '--manual-piece-cid', piece_cid, '--manual-piece-size', piece_size, data_cid, deal_conf.miner_id, _cost,
+               DURATION]
+    proc = subprocess.Popen(command, stdout=subprocess.PIPE)
+    resp = proc.stdout.readline().rstrip().decode('utf-8')
+    deal_cid = resp
+    if deal_cid:
+        logging.info(command)
+        logging.info("wallet: %s" % deal_conf.sender_wallet)
+        logging.info("miner: %s" % deal_conf.miner_id)
+        logging.info("price: %s" % _price)
+        logging.info("total cost: %s" % _cost)
+        logging.info("start epoch: %s" % start_epoch)
+        logging.info("fast-retrieval: %s" % str(deal_conf.fast_retrieval).lower())
+        logging.info("verified-deal: %s" % str(deal_conf.verified_deal).lower())
+        logging.info('Deal sent, deal cid: %s, start epoch: %s' % (deal_cid, start_epoch))
+    return deal_cid, start_epoch
 
 # https://docs.filecoin.io/store/lotus/very-large-files/#maximizing-storage-per-sector
 def calculate_piece_size_from_file_size(_file_size):
@@ -144,6 +166,7 @@ def send_deals_to_miner(deal_conf: DealConfig, output_dir, skip_confirmation: bo
                 for attr in row.keys():
                     deal.__setattr__(attr, row.get(attr))
                 deal_list.append(deal)
+
 
     for _deal in deal_list:
 

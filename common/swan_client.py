@@ -16,12 +16,16 @@ task_type_regular = "regular"
 class SwanTask:
     miner_id = None
 
-    def __init__(self, task_name: str, curated_dataset: str, description: str, is_public: bool, is_verified: bool):
+    def __init__(self, task_name: str, curated_dataset: str, description: str, is_public: bool, is_verified: bool,bid_mode: int,fast_retrieval:bool,max_price:str,expire_days:int):
         self.task_name = task_name
         self.curated_dataset = curated_dataset
         self.description = description
         self.is_public = is_public
         self.is_verified = is_verified
+        self.bid_mode = bid_mode
+        self.fast_retrieval = fast_retrieval
+        self.max_price = max_price
+        self.expire_days = expire_days
 
     def to_request_dict(self):
         return {
@@ -30,7 +34,11 @@ class SwanTask:
             'description': self.description,
             'is_public': 1 if self.is_public else 0,
             'type': task_type_verified if self.is_verified else task_type_regular,
-            'miner_id': self.miner_id if self.miner_id else ''
+            'miner_id': self.miner_id if self.miner_id else '',
+            'fast_retrieval':self.fast_retrieval,
+            'bid_mode': self.bid_mode,
+            'max_price': self.max_price,
+            'expire_days': self.expire_days
         }
 
 
@@ -100,6 +108,7 @@ class SwanClient:
         send_http_request(create_task_url, create_task_method, self.jwt_token, payload_data, file=csv)
         logging.info('New Swan task Generated.')
 
+
     @SwanTool.refresh_token
     def update_miner(self, miner: Miner):
         update_miner_url_suffix = '/miners/%s/status' % miner.miner_id
@@ -129,17 +138,16 @@ class SwanClient:
 
         send_http_request(url, update_offline_deal_details_method, self.jwt_token, body)
 
-    def upload_car_to_ipfs(car_file_path: str):
-        cmd = "ipfs add " + car_file_path + " | grep added"
+    def upload_car_to_ipfs(car_file_path: str,api_ip_address:str):
         try:
-            pipe = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            stdout, stderr = pipe.communicate()
-            if stdout == b'':
-                logging.error("Upload file to ipfs server failed.")
-                return None
-            stdout = stdout.decode("utf-8")
-            # ipfs add output example: added QmU5bGL6gBRr4ShxQLv9hq97SvrEFAU1uea3FE17QGpdbS file
-            car_file_hash = stdout.split(" ")[1]
+            gateway_address = api_ip_address + "/api/v0/add?stream-channels=true&pin=true"
+            with open(car_file_path, "rb") as a_file:
+                file_dict = {"file": a_file}
+                response = requests.post(gateway_address, files=file_dict)
+                if not response:
+                    logging.error("Upload file to ipfs server failed.")
+                    return None
+                car_file_hash = response.json()['Hash']
             return car_file_hash
 
         except Exception as error:
