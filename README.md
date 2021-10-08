@@ -1,5 +1,12 @@
-## If you are a client who wants to send deals
+# Swan Client Tool Guide
+[![Made by FilSwan](https://img.shields.io/badge/made%20by-FilSwan-green.svg)](https://www.filswan.com/)
+[![Chat on Slack](https://img.shields.io/badge/slack-filswan.slack.com-green.svg)](https://filswan.slack.com)
+[![standard-readme compliant](https://img.shields.io/badge/readme%20style-standard-brightgreen.svg)](https://github.com/RichardLitt/standard-readme)
 
+- Join us on our [public Slack channel](https://www.filswan.com/) for news, discussions, and status updates.
+- [Check out our medium](https://filswan.medium.com) for the latest posts and announcements.
+
+## If you are a client who wants to send deals
 
 Client Tool provides the following functions:
 * Encrypt and decrypt file with AES.
@@ -10,6 +17,12 @@ Client Tool provides the following functions:
 * Create tasks on Swan Platform.
 * Send deal automatically to auto-bid storage providers.
 
+## Table of Contents
+
+- [Basic Concept](#Basic-Concept)
+- [Prerequisite](#Prerequisite)
+- [Configuration and installation](#Configuration-and-installation)
+- [How to use](#How-to-use)
 
 ## Basic Concept
 
@@ -47,8 +60,9 @@ uuid is generated for future index purpose.
 - pip3
 
 
-## Config
+## Configuration and installation
 
+### Configuration
 In config.toml
 
 ```
@@ -118,6 +132,9 @@ e.g. http://host:port/ipfs/QmPrQPfGCAHwYXDZDdmLXieoxZP5JtwQuZMUEGuspKFZKQ
 - **max_price:** Max price willing to pay per GiB/epoch for offline deal
 - **start_epoch_hours:** start_epoch for deals in hours from current time
 - **expired_days:** expected completion days for storage provider sealing data 
+
+#### Note:
+The **duration** time for offline deals is set to `1512000` epoches in default, which stands for 525 days. It can be further modified in constant `DURATION` of `swan-client/task_sender/service/deal.py` for customized requirement.
 
 ### Installation:
 #### Ubuntu/Debian
