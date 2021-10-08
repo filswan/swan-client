@@ -19,9 +19,9 @@ Client Tool provides the following functions:
 
 ## Table of Contents
 
-- [Basic Concept](#Basic Concept)
+- [Basic Concept](#Basic-Concept)
 - [Prerequisite](#Prerequisite)
-- [Configuration and installation](#Configuration and installation)
+- [Configuration and installation](#Configuration-and-installation)
 - [How to use](#How-to-use)
 
 ## Basic Concept
