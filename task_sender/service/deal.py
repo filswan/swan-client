@@ -12,7 +12,7 @@ from common.OfflineDeal import OfflineDeal
 
 logging.basicConfig(level=logging.INFO)
 
-DURATION = '1051200'
+DURATION = '1512000'  ## 525 days
 EPOCH_PER_HOUR = 120
 
 
