@@ -19,7 +19,7 @@ def send_deals(config_path, miner_id, task_name=None, metadata_csv_path=None, de
     if not out_dir:
         output_dir = config['sender']['output_dir']
 
-    deal_config = DealConfig(miner_id, from_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours)
+    deal_config = DealConfig(miner_id, from_wallet, max_price, verified_deal, fast_retrieval, epoch_interval_hours,None)
 
     if deal_list:
         return send_deals_to_miner(deal_config, output_dir, skip_confirmation, task_name=task_name, deal_list=deal_list, task_uuid=task_uuid)
