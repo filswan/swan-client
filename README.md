@@ -62,6 +62,7 @@ uuid is generated for future index purpose.
 
 ## Configuration and installation
 
+### Configuration
 In config.toml
 
 ```
