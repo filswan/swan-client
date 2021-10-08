@@ -17,6 +17,12 @@ Client Tool provides the following functions:
 * Create tasks on Swan Platform.
 * Send deal automatically to auto-bid storage providers.
 
+## Table of Contents
+
+- [Basic Concept](#Basic Concept)
+- [Prerequisite](#Prerequisite)
+- [Configuration and installation](#Configuration and installation)
+- [How to use](#How-to-use)
 
 ## Basic Concept
 
@@ -54,7 +60,7 @@ uuid is generated for future index purpose.
 - pip3
 
 
-## Config
+## Configuration and installation
 
 In config.toml
 
