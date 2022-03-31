@@ -174,7 +174,7 @@ def send_deals_to_miner(deal_conf: DealConfig, output_dir, skip_confirmation: bo
         piece_cid = _deal.piece_cid
         source_file_url = _deal.car_file_url
         md5 = _deal.car_file_md5
-        file_size = _deal.source_file_size
+        file_size = _deal.car_file_size
         prices = get_miner_price(deal_conf.miner_id)
 
         if prices:
