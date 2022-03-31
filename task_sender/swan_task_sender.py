@@ -142,31 +142,30 @@ def go_generate_car(_deal_list: List[OfflineDeal], target_dir) -> List[OfflineDe
                             car_file_path = os.path.join(target_dir, row["playload_cid"] +'.car')
                             piececid = row["piece_cid"]
                             car_file_name = row["playload_cid"] +'.car'
-                            break
-             
-                        # no piece_cid generated. use data_cid instead
-                        data_cid=datacid
-                        piece_cid = piececid
-                        # _deal.piece_cid = piece_cid
-                        # _deal.data_cid = data_cid
-                        # _deal.car_file_size = os.path.getsize(car_file_path)
-                        if _deal.car_file_md5:
-                            car_md5 = checksum(car_file_path)
 
-                        csv_data = {
-                            'car_file_name': car_file_name,
-                            'car_file_path': car_file_path,
-                            'piece_cid': piece_cid,
-                            'data_cid': data_cid,
-                            'car_file_size': os.path.getsize(car_file_path),
-                            'car_file_md5': car_md5,
-                            'source_file_name': _deal.source_file_name,
-                            'source_file_path': _deal.source_file_path,
-                            'source_file_size': _deal.source_file_size,
-                            'source_file_md5': _deal.source_file_md5,
-                            'car_file_url': ''
-                        }
-                        csv_writer.writerow(csv_data)
+                            # no piece_cid generated. use data_cid instead
+                            data_cid=datacid
+                            piece_cid = piececid
+                            # _deal.piece_cid = piece_cid
+                            # _deal.data_cid = data_cid
+                            # _deal.car_file_size = os.path.getsize(car_file_path)
+                            if _deal.car_file_md5:
+                                car_md5 = checksum(car_file_path)
+
+                            csv_data = {
+                                'car_file_name': car_file_name,
+                                'car_file_path': car_file_path,
+                                'piece_cid': piece_cid,
+                                'data_cid': data_cid,
+                                'car_file_size': os.path.getsize(car_file_path),
+                                'car_file_md5': car_md5,
+                                'source_file_name': _deal.source_file_name,
+                                'source_file_path': _deal.source_file_path,
+                                'source_file_size': _deal.source_file_size,
+                                'source_file_md5': _deal.source_file_md5,
+                                'car_file_url': ''
+                            }
+                            csv_writer.writerow(csv_data)
 
     logging.info("Car files output dir: " + target_dir)
     logging.info("Please upload car files to web server or ipfs server.")
